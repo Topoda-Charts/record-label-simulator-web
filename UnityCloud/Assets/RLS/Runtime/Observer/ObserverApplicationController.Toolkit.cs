@@ -26,7 +26,20 @@ namespace Topoda.RLS.Observer
 
         private void InitializeToolkit()
         {
-            toolkitPanel = ScriptableObject.CreateInstance<PanelSettings>();
+            var panelSettingsAsset = Resources.Load<PanelSettings>("ObserverPanelSettings");
+            if (panelSettingsAsset != null)
+            {
+                toolkitPanel = Instantiate(panelSettingsAsset);
+            }
+            else if (Application.isEditor)
+            {
+                toolkitPanel = ScriptableObject.CreateInstance<PanelSettings>();
+            }
+            else
+            {
+                throw new InvalidOperationException(
+                    "Missing required Resources/ObserverPanelSettings.asset. Add a saved Panel Settings asset there so ICU data is included in player builds.");
+            }
             toolkitPanel.scaleMode = PanelScaleMode.ScaleWithScreenSize;
             toolkitPanel.referenceResolution = new Vector2Int(1600, 900);
             toolkitPanel.screenMatchMode = PanelScreenMatchMode.MatchWidthOrHeight;

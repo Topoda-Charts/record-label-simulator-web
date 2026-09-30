@@ -10,7 +10,7 @@ Project: `UnityCloud`, Unity `6000.5.5f1`. Unity CLI is installed at `C:\Users\j
 
 ```powershell
 unity run ./UnityCloud -- -executeMethod Topoda.RLS.Editor.CloudObserverBuild.GenerateScene
-unity test ./UnityCloud --mode EditMode --output ./Evidence/CU-03-editmode.xml
+unity test ./UnityCloud --mode EditMode --output ./Evidence/CU-03-editmode.xml -- -rlsSnapshotRoot C:/dev/record-label-simulator-web/UnityCloud/TestResults/ObserverSnapshots
 unity build ./UnityCloud --target WebGL --execute-method Topoda.RLS.Editor.CloudObserverBuild.BuildWebGL --output-path ./UnityCloud/Builds/WebGL
 node ./Evidence/serve-unity.cjs
 ```

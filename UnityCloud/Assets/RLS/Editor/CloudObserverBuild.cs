@@ -3,11 +3,13 @@ using System.IO;
 using System.Linq;
 using Topoda.RLS.Observer;
 using UnityEditor;
+using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
+using UnityEngine.UIElements;
 
 namespace Topoda.RLS.Editor
 {
@@ -31,7 +33,7 @@ namespace Topoda.RLS.Editor
             var cameraObject = new GameObject("Observer Camera");
             cameraObject.tag = "MainCamera";
             Camera camera = cameraObject.AddComponent<Camera>();
-            camera.clearFlags = CameraClearFlags.SolidColor;
+            camera.clearFlags = CameraClearFlags.Skybox;
             camera.backgroundColor = new Color(.68f, .74f, .80f);
             camera.fieldOfView = 58;
             camera.farClipPlane = 500;
@@ -59,6 +61,7 @@ namespace Topoda.RLS.Editor
             application.Configure(AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/RLS/Brand/favicon-darkmode-512.png"), ObserverReviewStage.Complete);
             application.WireObserverScene(world, rig);
             application.gameObject.AddComponent<CloudObserverReadback>();
+            CreatePanelSettings();
             EditorSceneManager.SaveScene(scene, ScenePath);
             EditorBuildSettings.scenes = new[] { new EditorBuildSettingsScene(ScenePath, true) };
             ConfigurePlayer();
@@ -85,15 +88,50 @@ namespace Topoda.RLS.Editor
             EditorUserBuildSettings.connectProfiler = false;
         }
 
+        private static void CreatePanelSettings()
+        {
+            const string path = "Assets/RLS/Resources/ObserverPanelSettings.asset";
+            var panel = AssetDatabase.LoadAssetAtPath<PanelSettings>(path);
+            if (panel == null)
+            {
+                panel = ScriptableObject.CreateInstance<PanelSettings>();
+                AssetDatabase.CreateAsset(panel, path);
+            }
+            panel.scaleMode = PanelScaleMode.ScaleWithScreenSize;
+            panel.referenceResolution = new Vector2Int(1600, 900);
+            panel.themeStyleSheet = Resources.Load<ThemeStyleSheet>("ObserverTheme");
+            EditorUtility.SetDirty(panel);
+        }
+
+        public static void BuildWebGLIteration()
+        {
+            BuildWebGLPlayer(true);
+        }
+
         public static void BuildWebGL()
         {
+            BuildWebGLPlayer(false);
+        }
+
+        private static void BuildWebGLPlayer(bool iteration)
+        {
             GenerateScene();
+            if (iteration)
+            {
+                PlayerSettings.SetIl2CppCompilerConfiguration(NamedBuildTarget.WebGL, Il2CppCompilerConfiguration.Debug);
+                PlayerSettings.SetIl2CppCodeGeneration(UnityEditor.Build.NamedBuildTarget.WebGL, Il2CppCodeGeneration.OptimizeSize);
+            }
+            else
+            {
+                PlayerSettings.SetIl2CppCompilerConfiguration(NamedBuildTarget.WebGL, Il2CppCompilerConfiguration.Release);
+                PlayerSettings.SetIl2CppCodeGeneration(UnityEditor.Build.NamedBuildTarget.WebGL, Il2CppCodeGeneration.OptimizeSpeed);
+            }
             string output = ReadArgument("-buildOutput") ?? Path.GetFullPath("Builds/WebGL");
             var options = new BuildPlayerOptions { scenes = new[] { ScenePath }, locationPathName = output, target = BuildTarget.WebGL, options = BuildOptions.None };
             BuildReport report = BuildPipeline.BuildPlayer(options);
             if (report.summary.result != BuildResult.Succeeded) throw new InvalidOperationException("Unity WebGL build failed: " + report.summary.result);
             string sourceCommit = Environment.GetEnvironmentVariable("RLS_BUILD_COMMIT") ?? "unavailable";
-            string receipt = "{\"unityVersion\":\"" + Application.unityVersion + "\",\"pipeline\":\"BuiltIn\",\"target\":\"WebGL\",\"sourceCommit\":\"" + sourceCommit + "\",\"development\":false,\"builtAtUtc\":\"" + DateTime.UtcNow.ToString("O") + "\",\"totalBytes\":" + report.summary.totalSize + "}";
+            string receipt = "{\"unityVersion\":\"" + Application.unityVersion + "\",\"pipeline\":\"BuiltIn\",\"target\":\"WebGL\",\"sourceCommit\":\"" + sourceCommit + "\",\"profile\":\"" + (iteration ? "Iteration" : "Release") + "\",\"development\":false,\"buildSeconds\":" + report.summary.totalTime.TotalSeconds.ToString(System.Globalization.CultureInfo.InvariantCulture) + ",\"builtAtUtc\":\"" + DateTime.UtcNow.ToString("O") + "\",\"totalBytes\":" + report.summary.totalSize + "}";
             File.WriteAllText(Path.Combine(output, "BUILD-INFO.json"), receipt);
             string htmlPath = Path.Combine(output, "index.html");
             string html = File.ReadAllText(htmlPath);
@@ -108,6 +146,7 @@ namespace Topoda.RLS.Editor
         public static void BuildWindowsValidation()
         {
             GenerateScene();
+            PlayerSettings.SetScriptingBackend(UnityEditor.Build.NamedBuildTarget.Standalone, ScriptingImplementation.Mono2x);
             PlayerSettings.SetGraphicsAPIs(BuildTarget.StandaloneWindows64, new[] { GraphicsDeviceType.Direct3D11 });
             string output = ReadArgument("-buildOutput") ?? Path.GetFullPath("Builds/Windows/RLS.exe");
             var report = BuildPipeline.BuildPlayer(new BuildPlayerOptions { scenes = new[] { ScenePath }, locationPathName = output, target = BuildTarget.StandaloneWindows64, options = BuildOptions.None });

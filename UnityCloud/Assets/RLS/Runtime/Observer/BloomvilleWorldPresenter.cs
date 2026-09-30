@@ -55,6 +55,7 @@ namespace Topoda.RLS.Observer
         private const float StylizedDaySunIntensity = 1.15f;
         private const float StylizedNightSunIntensity = 0.08f;
         private const float StylizedNightMoonIntensity = 0.18f;
+        private const float GroundHalfExtent = 100f;
 
         public int LabelHeadquarterCount { get { return labelVisuals.Count; } }
 
@@ -261,6 +262,7 @@ namespace Topoda.RLS.Observer
                 return;
             }
 
+            float roadSpan = GroundHalfExtent * 2f - 2f;
             CreatePrimitive(PrimitiveType.Plane, groundRoot, "Ground Plane", new Vector3(0f, 0f, 0f), new Vector3(20f, 1f, 20f), materials.Ground, false);
             for (int index = -4; index <= 4; index++)
             {
@@ -269,13 +271,14 @@ namespace Topoda.RLS.Observer
                     continue;
                 }
 
-                CreatePrimitive(PrimitiveType.Cube, groundRoot, "Road NS " + index, new Vector3(index * 16f, 0.02f, 0f), new Vector3(2.4f, 0.04f, 320f), materials.Road, false);
-                CreatePrimitive(PrimitiveType.Cube, groundRoot, "Road EW " + index, new Vector3(0f, 0.02f, index * 16f), new Vector3(320f, 0.04f, 2.4f), materials.Road, false);
+                CreatePrimitive(PrimitiveType.Cube, groundRoot, "Road NS " + index, new Vector3(index * 16f, 0.02f, 0f), new Vector3(2.4f, 0.04f, roadSpan), materials.Road, false);
+                CreatePrimitive(PrimitiveType.Cube, groundRoot, "Road EW " + index, new Vector3(0f, 0.02f, index * 16f), new Vector3(roadSpan, 0.04f, 2.4f), materials.Road, false);
             }
 
             CreatePrimitive(PrimitiveType.Cylinder, landmarkRoot, "Plaza Ring", new Vector3(0f, 0.05f, 0f), new Vector3(14f, 0.05f, 14f), materials.PlazaGarden, false);
             CreatePrimitive(PrimitiveType.Cube, landmarkRoot, "Annglora City Hall", new Vector3(0f, 4f, 0f), new Vector3(10f, 8f, 10f), materials.CityHallBase, true);
-            CreatePrimitive(PrimitiveType.Cylinder, landmarkRoot, "City Hall Dome", new Vector3(0f, 9.5f, 0f), new Vector3(4.5f, 1.2f, 4.5f), materials.CityHallDome, false);
+            BuildCityHallFacade();
+            CreatePrimitive(PrimitiveType.Sphere, landmarkRoot, "City Hall Dome", new Vector3(0f, 8f, 0f), new Vector3(6.2f, 3.8f, 6.2f), materials.CityHallDome, false);
             GameObject cityHallLabel = CreateWorldLabel(landmarkRoot, "City Hall", new Vector3(0f, 13f, 0f), 0.22f, new Color(0.92f, 0.96f, 0.93f));
             worldBillboards.Add(cityHallLabel.transform);
 
@@ -287,6 +290,34 @@ namespace Topoda.RLS.Observer
             foreach (KeyValuePair<string, Vector3> anchor in LabelAnchors)
             {
                 CreateDistrictPad(anchor.Value, anchor.Key.Substring(0, 3));
+            }
+        }
+
+        private void BuildCityHallFacade()
+        {
+            if (materials.CityHallDome != null)
+            {
+                CreatePrimitive(PrimitiveType.Cube, landmarkRoot, "City Hall Roof Cornice", new Vector3(0f, 8f, 0f), new Vector3(10.45f, 0.2f, 10.45f), materials.CityHallDome, false);
+            }
+
+            if (materials.AnngloraWindow != null)
+            {
+                for (int row = 0; row < 2; row++)
+                {
+                    float y = row == 0 ? 4.5f : 6.45f;
+                    for (int side = -1; side <= 1; side += 2)
+                    {
+                        CreatePrimitive(PrimitiveType.Cube, landmarkRoot, "City Hall Front Window", new Vector3(side * 2.55f, y, 5.06f), new Vector3(1.05f, 1.3f, 0.14f), materials.AnngloraWindow, false);
+                    }
+                }
+
+                CreatePrimitive(PrimitiveType.Cube, landmarkRoot, "City Hall West Window", new Vector3(-5.06f, 5.35f, 0f), new Vector3(0.14f, 1.3f, 1.05f), materials.AnngloraWindow, false);
+                CreatePrimitive(PrimitiveType.Cube, landmarkRoot, "City Hall East Window", new Vector3(5.06f, 5.35f, 0f), new Vector3(0.14f, 1.3f, 1.05f), materials.AnngloraWindow, false);
+            }
+
+            if (materials.Road != null)
+            {
+                CreatePrimitive(PrimitiveType.Cube, landmarkRoot, "City Hall Entry", new Vector3(0f, 1.55f, 5.07f), new Vector3(1.8f, 3.1f, 0.16f), materials.Road, false);
             }
         }
 
@@ -378,6 +409,7 @@ namespace Topoda.RLS.Observer
             Material hqMaterial = Instantiate(hqTemplate);
             GameObject headquarters = CreatePrimitive(PrimitiveType.Cube, root, "Headquarters", new Vector3(0f, 2f, 0f), new Vector3(6f, 4f, 6f), hqMaterial, true);
             headquarters.AddComponent<BloomvillePickTarget>().LabelId = labelId;
+            BuildHeadquartersFacade(headquarters.transform, nation);
 
             Transform marker = CreateWorldLabel(root, labelId, new Vector3(0f, 5.5f, 0f), 0.2f, Color.white).transform;
             worldBillboards.Add(marker);
@@ -399,6 +431,43 @@ namespace Topoda.RLS.Observer
                 StructureBlocks = new List<Renderer>(),
                 LastStructureSignature = int.MinValue
             };
+        }
+
+        private void BuildHeadquartersFacade(Transform building, string nation)
+        {
+            Material window = GetFacadeWindowTemplate(nation);
+            if (window != null)
+            {
+                CreatePrimitive(PrimitiveType.Cube, building, "HQ Front Window", new Vector3(-0.24f, 0.12f, 0.508f), new Vector3(0.17f, 0.16f, 0.02f), window, false);
+                CreatePrimitive(PrimitiveType.Cube, building, "HQ Front Window", new Vector3(0.24f, 0.12f, 0.508f), new Vector3(0.17f, 0.16f, 0.02f), window, false);
+                CreatePrimitive(PrimitiveType.Cube, building, "HQ Side Window", new Vector3(-0.508f, 0.12f, 0f), new Vector3(0.02f, 0.16f, 0.17f), window, false);
+                CreatePrimitive(PrimitiveType.Cube, building, "HQ Side Window", new Vector3(0.508f, 0.12f, 0f), new Vector3(0.02f, 0.16f, 0.17f), window, false);
+            }
+
+            if (materials.Road != null)
+            {
+                CreatePrimitive(PrimitiveType.Cube, building, "HQ Entry", new Vector3(0f, -0.31f, 0.508f), new Vector3(0.18f, 0.34f, 0.024f), materials.Road, false);
+            }
+
+            if (materials.CityHallDome != null)
+            {
+                CreatePrimitive(PrimitiveType.Cube, building, "HQ Roof Trim", new Vector3(0f, 0.49f, 0f), new Vector3(1.04f, 0.035f, 1.04f), materials.CityHallDome, false);
+            }
+        }
+
+        private Material GetFacadeWindowTemplate(string nation)
+        {
+            if (string.Equals(nation, "Byteria", StringComparison.Ordinal))
+            {
+                return materials.ByteriaNeonWindow;
+            }
+
+            if (string.Equals(nation, "Crownia", StringComparison.Ordinal))
+            {
+                return materials.CrowniaReflectiveWindow;
+            }
+
+            return materials.AnngloraWindow;
         }
 
         private void UpdateLabelVisual(LabelVisual visual, LabelRecord label, WorldSnapshot snapshot)

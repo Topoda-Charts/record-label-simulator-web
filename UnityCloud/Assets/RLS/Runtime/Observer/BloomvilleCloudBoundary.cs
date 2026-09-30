@@ -14,8 +14,8 @@ namespace Topoda.RLS.Observer
     public sealed class BloomvilleCloudBoundary : MonoBehaviour
     {
         private const int MaxPuffs = 48;
-        private const int LatitudeSegments = 5;
-        private const int LongitudeSegments = 10;
+        private const int LatitudeSegments = 6;
+        private const int LongitudeSegments = 12;
         private const float MinBoundaryRadius = 90f;
         private const float MaxBoundaryRadius = 110f;
         private static readonly int ColorPropertyId = Shader.PropertyToID("_Color");
@@ -91,9 +91,9 @@ namespace Topoda.RLS.Observer
                 float x = Mathf.Cos(angle) * radius;
                 float z = Mathf.Sin(angle) * radius;
                 float y = altitude + Mathf.Sin(index * 1.73f) * 2.8f;
-                float width = Mathf.Lerp(11f, 16f, Mathf.Repeat(index * 0.37f, 1f));
-                float depth = Mathf.Lerp(6f, 10f, Mathf.Repeat(index * 0.53f, 1f));
-                float height = Mathf.Lerp(2.6f, 4.2f, Mathf.Repeat(index * 0.71f, 1f));
+                float width = Mathf.Lerp(10f, 14f, Mathf.Repeat(index * 0.37f, 1f));
+                float depth = Mathf.Lerp(8f, 11f, Mathf.Repeat(index * 0.53f, 1f));
+                float height = Mathf.Lerp(4.8f, 6.5f, Mathf.Repeat(index * 0.71f, 1f));
                 float yaw = angle * Mathf.Rad2Deg + 90f;
 
                 Vector3 localPosition = new Vector3(x, y, z);
@@ -146,11 +146,11 @@ namespace Topoda.RLS.Observer
                     int first = latitude * columns + longitude;
                     int nextRow = first + columns;
                     triangles[triangleIndex++] = first;
-                    triangles[triangleIndex++] = nextRow + 1;
                     triangles[triangleIndex++] = nextRow;
-                    triangles[triangleIndex++] = first;
-                    triangles[triangleIndex++] = first + 1;
                     triangles[triangleIndex++] = nextRow + 1;
+                    triangles[triangleIndex++] = first;
+                    triangles[triangleIndex++] = nextRow + 1;
+                    triangles[triangleIndex++] = first + 1;
                 }
             }
 

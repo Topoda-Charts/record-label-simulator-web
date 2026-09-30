@@ -1,0 +1,67 @@
+{
+  "url": "http://localhost:8080/",
+  "january": {
+    "state": "Observer",
+    "date": "2425-01-01T00:00:00.0000000Z",
+    "digest": "14ca16afdbbde7ce4d5438791b5fe1ddb450620cddb0d8f0a5d466e5a6bed051",
+    "members": 24,
+    "labels": 8,
+    "tracks": 0,
+    "events": 2,
+    "cash": 1000000,
+    "snapshotRoundTrip": false,
+    "visibleRenderers": 186
+  },
+  "september": {
+    "state": "Observer",
+    "date": "2425-09-30T12:00:00.0000000Z",
+    "digest": "78fe7d890f4024831ff3a4f5e61f024e6f7deaabe0d02fb3a3346c98bcc929ba",
+    "members": 24,
+    "labels": 8,
+    "tracks": 293,
+    "events": 600,
+    "cash": 277776,
+    "snapshotRoundTrip": false,
+    "visibleRenderers": 212
+  },
+  "saved": {
+    "state": "Observer",
+    "date": "2425-09-30T12:00:00.0000000Z",
+    "digest": "78fe7d890f4024831ff3a4f5e61f024e6f7deaabe0d02fb3a3346c98bcc929ba",
+    "members": 24,
+    "labels": 8,
+    "tracks": 293,
+    "events": 600,
+    "cash": 277776,
+    "snapshotRoundTrip": true,
+    "visibleRenderers": 204
+  },
+  "reloaded": {
+    "state": "Observer",
+    "date": "2425-09-30T12:00:00.0000000Z",
+    "digest": "78fe7d890f4024831ff3a4f5e61f024e6f7deaabe0d02fb3a3346c98bcc929ba",
+    "members": 24,
+    "labels": 8,
+    "tracks": 293,
+    "events": 600,
+    "cash": 277776,
+    "snapshotRoundTrip": false,
+    "visibleRenderers": 212
+  },
+  "errors": [
+    "Can't add component because class 'CapsuleCollider' doesn't exist!\n",
+    "ICU Data not available. The data should be automatically assigned to the PanelSettings in the editor if the advanced text option is enable in the project settings. It will not be present on PanelSettings created at runtime, so make sure the build contains at least one PanelSettings asset\n",
+    "NullReferenceException: Object reference not set to an instance of an object.\n\n\n",
+    "Can't add component because class 'MeshCollider' doesn't exist!\n",
+    "Can't add component because class 'SphereCollider' doesn't exist!\n"
+  ],
+  "passed": false,
+  "errorCount": 14663,
+  "errorCounts": {
+    "Can't add component because class 'CapsuleCollider' doesn't exist!\n": 34,
+    "ICU Data not available. The data should be automatically assigned to the PanelSettings in the editor if the advanced text option is enable in the project settings. It will not be present on PanelSettings created at runtime, so make sure the build contains at least one PanelSettings asset\n": 14207,
+    "NullReferenceException: Object reference not set to an instance of an object.\n\n\n": 366,
+    "Can't add component because class 'MeshCollider' doesn't exist!\n": 2,
+    "Can't add component because class 'SphereCollider' doesn't exist!\n": 54
+  }
+}

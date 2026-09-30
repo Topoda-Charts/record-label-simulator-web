@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "generator": {
+    "name": "unity-cli",
+    "version": "1.0.0-beta.11"
+  },
+  "outcome": "success",
+  "exitCode": 0,
+  "startedAt": "2026-09-30T19:38:36.651Z",
+  "endedAt": "2026-09-30T19:57:58.353Z",
+  "editor": {
+    "version": "6000.5.5f1",
+    "changeset": "d16e074b49fd",
+    "architecture": "x86_64"
+  },
+  "build": {
+    "target": "WebGL",
+    "executeMethod": "Topoda.RLS.Editor.CloudObserverBuild.BuildWebGL",
+    "outputPath": "Builds/WebGL"
+  },
+  "packages": {
+    "source": "packages-lock.json",
+    "entries": {
+      "com.unity.ext.nunit": "2.1.0",
+      "com.unity.inputsystem": "1.19.0",
+      "com.unity.nuget.mono-cecil": "1.11.6",
+      "com.unity.nuget.newtonsoft-json": "3.2.2",
+      "com.unity.pipeline": "0.4.0-exp.1",
+      "com.unity.test-framework": "1.7.0",
+      "com.unity.modules.ai": "1.0.0",
+      "com.unity.modules.animation": "1.0.0",
+      "com.unity.modules.audio": "1.0.0",
+      "com.unity.modules.hierarchycore": "1.0.0",
+      "com.unity.modules.imageconversion": "1.0.0",
+      "com.unity.modules.imgui": "1.0.0",
+      "com.unity.modules.jsonserialize": "1.0.0",
+      "com.unity.modules.physics": "1.0.0",
+      "com.unity.modules.screencapture": "1.0.0",
+      "com.unity.modules.ui": "1.0.0",
+      "com.unity.modules.uielements": "1.0.0",
+      "com.unity.modules.unitywebrequest": "1.0.0"
+    }
+  }
+}

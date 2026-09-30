@@ -238,6 +238,8 @@ namespace Topoda.RLS.Observer
             }
 
             GameObject temp = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+            // Keep the built-in collider component reachable when WebGL strips unused engine types.
+            _ = temp.GetComponent<CapsuleCollider>();
             MeshFilter filter = temp.GetComponent<MeshFilter>();
             proxyMesh = filter.sharedMesh;
             Destroy(temp);

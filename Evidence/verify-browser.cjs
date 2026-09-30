@@ -6,10 +6,12 @@ const directory = path.join(__dirname, 'Captures');
 fs.mkdirSync(directory,{recursive:true});
 (async()=>{
  const browser = await chromium.launch({executablePath:'C:/Program Files/Google/Chrome/Application/chrome.exe',headless:true,args:['--enable-webgl','--enable-unsafe-swiftshader']});
- const errors=[],messages=[];
+ const deadline = setTimeout(()=>browser.close().catch(()=>{}),15*60*1000);
+ const errors=[],messages=[],errorCounts={};
+ const recordError=text=>{errorCounts[text]=(errorCounts[text]||0)+1;if(!errors.includes(text))errors.push(text);};
  const page = await browser.newPage({viewport:{width:1600,height:900}});
- page.on('console',msg=>{messages.push({type:msg.type(),text:msg.text()});if(msg.type()==='error')errors.push(msg.text());});
- page.on('pageerror',err=>errors.push(err.message));
+ page.on('console',msg=>{if(messages.length<2000)messages.push({type:msg.type(),text:msg.text()});if(msg.type()==='error')recordError(msg.text());});
+ page.on('pageerror',err=>recordError(err.message));
  const send = async method=>page.evaluate(method=>window.rlsUnityInstance.SendMessage('RLS Observer Application',method,''),method);
  const summary = async()=>{await send('Summary');return page.evaluate(()=>window.rlsObserverReceipt);};
  try {
@@ -17,16 +19,20 @@ fs.mkdirSync(directory,{recursive:true});
   await page.waitForFunction(()=>window.rlsUnityInstance,{timeout:240000});
   await page.waitForTimeout(2500);
   await page.screenshot({path:path.join(directory,'01-menu.png')});
+  process.stdout.write('RLS_CAPTURE_READY 01-menu.png\n');
   await send('Watch');
   await page.waitForTimeout(4000);
   const january=await summary();
   if(january.state!=='Observer'||!january.date.startsWith('2425-01-01')||january.visibleRenderers<10)throw new Error('Unity January observer readback failed');
   await page.screenshot({path:path.join(directory,'02-january-world.png')});
+  fs.writeFileSync(path.join(__dirname,'CU-04-january.json'),JSON.stringify(january,null,2));
+  process.stdout.write('RLS_CAPTURE_READY 02-january-world.png\n');
   await send('September');
   await page.waitForTimeout(3000);
   const september=await summary();
   if(!september.date.startsWith('2425-09-30')||september.tracks<1||september.events<=january.events)throw new Error('September simulation progression failed');
   await page.screenshot({path:path.join(directory,'03-september-world.png')});
+  process.stdout.write('RLS_CAPTURE_READY 03-september-world.png\n');
   await send('RoundTrip');
   const saved=await summary();
   if(!saved.snapshotRoundTrip)throw new Error('Browser snapshot round-trip failed');
@@ -39,10 +45,18 @@ fs.mkdirSync(directory,{recursive:true});
   const reloaded=await summary();
   if(reloaded.digest!==saved.digest)throw new Error('Browser reload lost the persisted snapshot');
   await page.screenshot({path:path.join(directory,'04-reloaded-snapshot.png')});
-  const result={url,january,september,saved,reloaded,errors,passed:errors.length===0};
+  const result={url,january,september,saved,reloaded,errors,errorCounts,passed:errors.length===0};
   fs.writeFileSync(path.join(__dirname,'CU-04-browser.json'),JSON.stringify(result,null,2));
   fs.writeFileSync(path.join(__dirname,'CU-04-browser-console.json'),JSON.stringify(messages,null,2));
   process.stdout.write(JSON.stringify(result,null,2)+'\n');
   if(errors.length)process.exitCode=1;
- } finally {await browser.close();}
+ } catch(error) {
+  fs.writeFileSync(path.join(__dirname,'CU-04-browser-failure.json'),JSON.stringify({url,error:error.stack,errors,messages},null,2));
+  await page.screenshot({path:path.join(directory,'failure.png')}).catch(()=>{});
+  throw error;
+ } finally {
+  clearTimeout(deadline);
+  fs.writeFileSync(path.join(__dirname,'CU-04-browser-console.json'),JSON.stringify(messages,null,2));
+  await browser.close();
+ }
 })().catch(error=>{process.stderr.write(error.stack+'\n');process.exitCode=1;});
