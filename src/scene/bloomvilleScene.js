@@ -1,5 +1,10 @@
 import * as THREE from "three";
 import { Palette } from "../config/palette.js";
+import {
+  createDefaultViewState,
+  pan,
+  zoom,
+} from "../view/index.js";
 import { createCityHall, createDistrictBuilding } from "./buildingModule.js";
 import { createMemberMarker } from "./memberMarker.js";
 
@@ -9,7 +14,11 @@ const STREET_M = 12;
 const SIDEWALK_M = 2;
 const MAIN_SPAN_M = LOT_M * 4 + STREET_M;
 const SKY_COLOR = 0xd7e2f0;
-const ORTHO_HALF_H = 40;
+/** Calibrated from the working three-quarter rig: ground target + fixed yaw / elevation. */
+const RIG_YAW_RAD = Math.atan2(56, 71);
+const RIG_HORIZONTAL_M = Math.hypot(56, 71);
+const RIG_ELEVATION_M = 54;
+const WHEEL_ZOOM_FACTOR = 1.08;
 
 export function createBloomvilleScene(canvas) {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
@@ -25,12 +34,13 @@ export function createBloomvilleScene(canvas) {
   /** Fog starts beyond the built slice so the street stays crisp. */
   scene.fog = new THREE.Fog(SKY_COLOR, 150, 215);
 
-  const viewTarget = new THREE.Vector3(0, 7, -1);
-  const camera = new THREE.OrthographicCamera(-72, 72, 40, -40, 0.5, 260);
-  camera.position.set(56, 54, 70);
+  const lookPoint = new THREE.Vector3();
+  const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.5, 260);
   camera.up.set(0, 1, 0);
-  camera.lookAt(viewTarget);
-  camera.updateProjectionMatrix();
+  let viewState = createDefaultViewState();
+  let dragging = false;
+  let lastPointerX = 0;
+  let lastPointerY = 0;
 
   const hemi = new THREE.HemisphereLight(0xf0e8f8, 0x7a7268, 0.6);
   scene.add(hemi);
@@ -114,18 +124,75 @@ export function createBloomvilleScene(canvas) {
   let frameId = 0;
   const clock = new THREE.Clock();
 
+  function applyViewToCamera() {
+    const width = canvas.clientWidth;
+    const height = canvas.clientHeight;
+    if (width === 0 || height === 0) return;
+    const { target, halfHeight } = viewState;
+    const aspect = width / height;
+    camera.left = -halfHeight * aspect;
+    camera.right = halfHeight * aspect;
+    camera.top = halfHeight;
+    camera.bottom = -halfHeight;
+    lookPoint.set(target.x, 0, target.z);
+    camera.position.set(
+      target.x + RIG_HORIZONTAL_M * Math.sin(RIG_YAW_RAD),
+      RIG_ELEVATION_M,
+      target.z + RIG_HORIZONTAL_M * Math.cos(RIG_YAW_RAD),
+    );
+    camera.lookAt(lookPoint);
+    camera.updateProjectionMatrix();
+  }
+
   function resize() {
     const width = canvas.clientWidth;
     const height = canvas.clientHeight;
     if (width === 0 || height === 0) return;
     renderer.setSize(width, height, false);
-    const aspect = width / height;
-    camera.left = -ORTHO_HALF_H * aspect;
-    camera.right = ORTHO_HALF_H * aspect;
-    camera.top = ORTHO_HALF_H;
-    camera.bottom = -ORTHO_HALF_H;
-    camera.updateProjectionMatrix();
-    camera.lookAt(viewTarget);
+    applyViewToCamera();
+  }
+
+  function metersPerPixelY() {
+    const height = canvas.clientHeight;
+    if (height <= 0) return 0;
+    return (2 * viewState.halfHeight) / height;
+  }
+
+  function onPointerDown(event) {
+    if (event.button !== 0) return;
+    dragging = true;
+    lastPointerX = event.clientX;
+    lastPointerY = event.clientY;
+    canvas.setPointerCapture(event.pointerId);
+  }
+
+  function onPointerMove(event) {
+    if (!dragging) return;
+    const deltaX = event.clientX - lastPointerX;
+    const deltaY = event.clientY - lastPointerY;
+    lastPointerX = event.clientX;
+    lastPointerY = event.clientY;
+    const meterScale = metersPerPixelY();
+    const aspect = canvas.clientWidth / Math.max(canvas.clientHeight, 1);
+    const dx = -deltaX * meterScale * aspect;
+    const dz = -deltaY * meterScale;
+    viewState = pan(viewState, dx, dz);
+    applyViewToCamera();
+  }
+
+  function endDrag(event) {
+    if (!dragging) return;
+    dragging = false;
+    if (canvas.hasPointerCapture(event.pointerId)) {
+      canvas.releasePointerCapture(event.pointerId);
+    }
+  }
+
+  function onWheel(event) {
+    event.preventDefault();
+    const factor = event.deltaY > 0 ? WHEEL_ZOOM_FACTOR : 1 / WHEEL_ZOOM_FACTOR;
+    viewState = zoom(viewState, factor);
+    applyViewToCamera();
   }
 
   function animate() {
@@ -140,12 +207,19 @@ export function createBloomvilleScene(canvas) {
       entry.mesh.material.opacity =
         entry.baseOpacity + Math.sin(t * 0.22 + entry.phase) * 0.03;
     }
+    applyViewToCamera();
     renderer.render(scene, camera);
   }
 
   resize();
   requestAnimationFrame(resize);
   animate();
+
+  canvas.addEventListener("pointerdown", onPointerDown);
+  canvas.addEventListener("pointermove", onPointerMove);
+  canvas.addEventListener("pointerup", endDrag);
+  canvas.addEventListener("pointercancel", endDrag);
+  canvas.addEventListener("wheel", onWheel, { passive: false });
 
   const ro = new ResizeObserver(resize);
   ro.observe(canvas);
@@ -163,6 +237,11 @@ export function createBloomvilleScene(canvas) {
       cancelAnimationFrame(frameId);
       ro.disconnect();
       window.removeEventListener("resize", resize);
+      canvas.removeEventListener("pointerdown", onPointerDown);
+      canvas.removeEventListener("pointermove", onPointerMove);
+      canvas.removeEventListener("pointerup", endDrag);
+      canvas.removeEventListener("pointercancel", endDrag);
+      canvas.removeEventListener("wheel", onWheel);
       renderer.dispose();
     },
   };
