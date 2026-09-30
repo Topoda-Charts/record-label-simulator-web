@@ -111,7 +111,7 @@ namespace Topoda.RLS.Observer
             HandleObserverWorldSelection();
             UpdateMemberFollowing();
             RefreshWorldPresenter(false);
-            if (showSnapshotPicker || simulation.World.Clock.Paused || reviewStage == ObserverReviewStage.MenuAndShell)
+            if (skipInProgress || showSnapshotPicker || simulation.World.Clock.Paused || reviewStage == ObserverReviewStage.MenuAndShell)
             {
                 return;
             }

@@ -6,6 +6,11 @@ namespace Topoda.RLS.Observer
 {
     public sealed partial class ObserverApplicationController
     {
+        private bool skipInProgress;
+        private float skipProgress;
+        private string skipMessage = string.Empty;
+        public bool SkipInProgress { get { return skipInProgress; } }
+        public float SkipProgress { get { return skipProgress; } }
         private void BeginObserver(ObserverMode selectedMode)
         {
             mode = selectedMode;
@@ -62,6 +67,7 @@ namespace Topoda.RLS.Observer
 
         private void TogglePause()
         {
+            if (skipInProgress) return;
             SafeAutosave("before pause change");
             simulation.World.Clock.Paused = !simulation.World.Clock.Paused;
             simulation.RefreshDigest();
@@ -70,6 +76,7 @@ namespace Topoda.RLS.Observer
 
         private void SetSpeed(int speed)
         {
+            if (skipInProgress || (speed != 1 && speed != 2 && speed != 4)) return;
             SafeAutosave("before speed change");
             simulation.World.Clock.Speed = speed;
             simulation.RefreshDigest();
@@ -78,22 +85,60 @@ namespace Topoda.RLS.Observer
 
         private void Skip(TimeSpan duration)
         {
-            try
+            if (simulation == null || skipInProgress || (duration != TimeSpan.FromDays(1) && duration != TimeSpan.FromDays(7))) return;
+            SafeAutosave("before Skip Time");
+            simulation.World.Clock.Paused = true;
+            simulationAccumulator = 0f;
+            skipProgress = 0f;
+            skipMessage = "Simulating " + (duration.TotalDays == 1 ? "one day" : "one week") + "…";
+            skipInProgress = true;
+            StartCoroutine(SimulateSkip(duration));
+        }
+
+        private IEnumerator SimulateSkip(TimeSpan duration)
+        {
+            long totalSteps = (long)duration.TotalMinutes / simulation.World.Clock.FixedStepMinutes;
+            long completedSteps = 0;
+            // Web players run on the main thread. Yield between bounded chunks
+            // so the world and progress bar continue rendering during a skip.
+            yield return null;
+            while (completedSteps < totalSteps)
             {
-                SafeAutosave("before Skip Time");
-                simulation.AdvanceTo(simulation.World.Clock.CurrentUtc + duration);
-                simulation.World.Clock.Paused = true;
-                simulation.RefreshDigest();
-                statusMessage = "Skipped to " + simulation.World.Clock.CurrentUtc.ToString("MMM d, yyyy HH:mm");
+                double frameStarted = Time.realtimeSinceStartupAsDouble;
+                bool failed = false;
+                do
+                {
+                    try
+                    {
+                        long chunkSteps = Math.Min(24, totalSteps - completedSteps);
+                        simulation.AdvanceSteps(chunkSteps);
+                        completedSteps += chunkSteps;
+                    }
+                    catch (Exception exception)
+                    {
+                        plainLanguageError = "Skip stopped at the last simulated tick. " + exception.Message;
+                        skipInProgress = false;
+                        simulation.RefreshDigest();
+                        failed = true;
+                    }
+                }
+                while (!failed && completedSteps < totalSteps && Time.realtimeSinceStartupAsDouble - frameStarted < 0.008);
+                if (failed) yield break;
+                skipProgress = (float)completedSteps / totalSteps;
+                skipMessage = "Simulating " + simulation.World.Clock.CurrentUtc.ToString("MMM d, HH:mm") + "…";
+                RefreshWorldPresenter(true);
+                yield return null;
             }
-            catch (Exception exception)
-            {
-                plainLanguageError = exception.Message;
-            }
+            skipInProgress = false;
+            skipProgress = 1f;
+            simulation.RefreshDigest();
+            SafeAutosave("completed Skip Time");
+            statusMessage = "Simulated through " + simulation.World.Clock.CurrentUtc.ToString("MMM d, yyyy HH:mm");
         }
 
         private void ResetWorld()
         {
+            if (skipInProgress) return;
             SafeAutosave("before reset");
             simulation.Reset();
             if (mode == ObserverMode.OpenHandoff && reviewStage != ObserverReviewStage.MenuAndShell)
@@ -107,6 +152,7 @@ namespace Topoda.RLS.Observer
 
         private void SaveNamedSnapshot()
         {
+            if (skipInProgress) return;
             bool wasPaused = simulation.World.Clock.Paused;
             try
             {
@@ -129,6 +175,7 @@ namespace Topoda.RLS.Observer
 
         private void LoadSnapshot(string fileName)
         {
+            if (skipInProgress) return;
             try
             {
                 SafeAutosave("before loading snapshot");
@@ -151,6 +198,7 @@ namespace Topoda.RLS.Observer
 
         private void ReturnToMenu()
         {
+            if (skipInProgress) return;
             SafeAutosave("before return to menu");
             state = ApplicationState.MainMenu;
         }

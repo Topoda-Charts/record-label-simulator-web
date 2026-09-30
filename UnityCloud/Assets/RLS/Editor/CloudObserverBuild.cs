@@ -179,7 +179,7 @@ namespace Topoda.RLS.Editor
             return new BloomvilleMaterialSet {
                 Ground = Lit("ObserverGround", new Color(.34f,.4f,.36f)),
                 Road = Lit("ObserverRoad", new Color(.22f,.26f,.3f)),
-                CityHallBase = Lit("ObserverCityHallBase", new Color(.42f,.28f,.58f), .1f,.42f),
+                CityHallBase = Lit("ObserverCityHallBase", new Color(.62f,.60f,.55f), .1f,.42f),
                 CityHallDome = Lit("ObserverCityHallDome", new Color(.78f,.66f,.38f), .85f,.82f),
                 PlazaGarden = Lit("ObserverPlazaGarden", new Color(.28f,.46f,.32f)),
                 FloraCanopy = Lit("ObserverFloraCanopy", new Color(.14f,.42f,.24f)),

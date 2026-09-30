@@ -9,14 +9,9 @@ namespace Topoda.RLS.Observer
     {
         private static readonly Dictionary<string, Vector3> LabelAnchors = new Dictionary<string, Vector3>(StringComparer.Ordinal)
         {
-            { "ARL1", new Vector3(-42f, 0f, 28f) },
-            { "ARL2", new Vector3(-58f, 0f, 0f) },
-            { "ARL3", new Vector3(-42f, 0f, -28f) },
-            { "BRL1", new Vector3(42f, 0f, 28f) },
-            { "BRL2", new Vector3(58f, 0f, 0f) },
-            { "BRL3", new Vector3(42f, 0f, -28f) },
-            { "CRL1", new Vector3(-18f, 0f, -52f) },
-            { "CRL2", new Vector3(18f, 0f, -52f) }
+            { "ARL1", new Vector3(-36f, 0f, 36f) },
+            { "ARL2", new Vector3(-36f, 0f, 0f) },
+            { "ARL3", new Vector3(-36f, 0f, -36f) }
         };
 
         [SerializeField] private Light sunLight;
@@ -55,9 +50,10 @@ namespace Topoda.RLS.Observer
         private const float StylizedDaySunIntensity = 1.15f;
         private const float StylizedNightSunIntensity = 0.08f;
         private const float StylizedNightMoonIntensity = 0.18f;
-        private const float GroundHalfExtent = 100f;
+        private const float GroundHalfExtent = 60f;
 
         public int LabelHeadquarterCount { get { return labelVisuals.Count; } }
+        public int DisplayedProductionStructureCount { get { return labelVisuals.Count; } }
 
         public BloomvilleMaterialSet Materials { get { return materials; } }
 
@@ -262,17 +258,29 @@ namespace Topoda.RLS.Observer
                 return;
             }
 
-            float roadSpan = GroundHalfExtent * 2f - 2f;
-            CreatePrimitive(PrimitiveType.Plane, groundRoot, "Ground Plane", new Vector3(0f, 0f, 0f), new Vector3(20f, 1f, 20f), materials.Ground, false);
-            for (int index = -4; index <= 4; index++)
+            const float lotWidth = 24f;
+            const float streetWidth = 12f;
+            const float roadSpan = 120f;
+            CreatePrimitive(PrimitiveType.Plane, groundRoot, "Central neighborhood ground", Vector3.zero, new Vector3(12f, 1f, 12f), materials.Ground, false);
+            // Nine lots in the currently visible Central slice. These are lots,
+            // not nine Areas; unopened Areas have no ground plane here.
+            for (int x = -1; x <= 1; x++)
             {
-                if (index == 0)
+                for (int z = -1; z <= 1; z++)
                 {
-                    continue;
+                    CreatePrimitive(PrimitiveType.Cube, groundRoot, "Lot " + x + "/" + z,
+                        new Vector3(x * 36f, 0.012f, z * 36f), new Vector3(lotWidth, 0.024f, lotWidth), materials.PlazaGarden, false);
                 }
-
-                CreatePrimitive(PrimitiveType.Cube, groundRoot, "Road NS " + index, new Vector3(index * 16f, 0.02f, 0f), new Vector3(2.4f, 0.04f, roadSpan), materials.Road, false);
-                CreatePrimitive(PrimitiveType.Cube, groundRoot, "Road EW " + index, new Vector3(0f, 0.02f, index * 16f), new Vector3(roadSpan, 0.04f, 2.4f), materials.Road, false);
+            }
+            foreach (float street in new[] { -54f, -18f, 18f, 54f })
+            {
+                CreatePrimitive(PrimitiveType.Cube, groundRoot, "North-south street", new Vector3(street, 0.04f, 0f), new Vector3(streetWidth, 0.04f, roadSpan), materials.Road, false);
+                CreatePrimitive(PrimitiveType.Cube, groundRoot, street == -18f ? "Main Street" : "East-west street", new Vector3(0f, 0.04f, street), new Vector3(roadSpan, 0.04f, streetWidth), materials.Road, false);
+                foreach (float side in new[] { -4.8f, 4.8f })
+                {
+                    CreatePrimitive(PrimitiveType.Cube, groundRoot, "Sidewalk", new Vector3(street + side, 0.09f, 0f), new Vector3(2.4f, 0.10f, roadSpan), materials.CityHallBase, false);
+                    CreatePrimitive(PrimitiveType.Cube, groundRoot, "Sidewalk", new Vector3(0f, 0.09f, street + side), new Vector3(roadSpan, 0.10f, 2.4f), materials.CityHallBase, false);
+                }
             }
 
             CreatePrimitive(PrimitiveType.Cylinder, landmarkRoot, "Plaza Ring", new Vector3(0f, 0.05f, 0f), new Vector3(14f, 0.05f, 14f), materials.PlazaGarden, false);
@@ -284,7 +292,6 @@ namespace Topoda.RLS.Observer
 
             BuildPlazaTerraces();
             BuildCentralGarden();
-            BuildCanalAccent();
             BuildFloraRing();
 
             foreach (KeyValuePair<string, Vector3> anchor in LabelAnchors)
@@ -376,7 +383,7 @@ namespace Topoda.RLS.Observer
                 padMaterial = materials.CrowniaDistrictPad;
             }
 
-            CreatePrimitive(PrimitiveType.Cube, groundRoot, "District " + districtCode, center + new Vector3(0f, 0.01f, 0f), new Vector3(26f, 0.02f, 26f), padMaterial, false);
+            CreatePrimitive(PrimitiveType.Cube, groundRoot, "Production lot", center + new Vector3(0f, 0.035f, 0f), new Vector3(24f, 0.025f, 24f), materials.PlazaGarden, false);
         }
 
         private void RebuildLabels(WorldSnapshot snapshot)
@@ -384,6 +391,8 @@ namespace Topoda.RLS.Observer
             for (int index = 0; index < snapshot.Labels.Count; index++)
             {
                 LabelRecord label = snapshot.Labels[index];
+                StructureRecord structure = snapshot.Structures.Find(item => item.LabelId == label.Id);
+                if (structure == null) continue;
                 if (!LabelAnchors.TryGetValue(label.Id, out Vector3 anchor))
                 {
                     continue;
@@ -401,17 +410,17 @@ namespace Topoda.RLS.Observer
 
         private LabelVisual CreateLabelVisual(string labelId, Vector3 anchor, string nation)
         {
-            var root = new GameObject("HQ " + labelId).transform;
+            var root = new GameObject("Production lot " + labelId).transform;
             root.SetParent(labelsRoot, false);
             root.position = anchor;
 
-            Material hqTemplate = GetHeadquartersTemplate(nation);
+            Material hqTemplate = materials.StructureBase;
             Material hqMaterial = Instantiate(hqTemplate);
-            GameObject headquarters = CreatePrimitive(PrimitiveType.Cube, root, "Headquarters", new Vector3(0f, 2f, 0f), new Vector3(6f, 4f, 6f), hqMaterial, true);
+            GameObject headquarters = CreatePrimitive(PrimitiveType.Cube, root, "Production Structure", new Vector3(0f, 2.5f, 0f), new Vector3(12f, 5f, 10f), hqMaterial, true);
             headquarters.AddComponent<BloomvillePickTarget>().LabelId = labelId;
             BuildHeadquartersFacade(headquarters.transform, nation);
 
-            Transform marker = CreateWorldLabel(root, labelId, new Vector3(0f, 5.5f, 0f), 0.2f, Color.white).transform;
+            Transform marker = CreateWorldLabel(root, "Production", new Vector3(0f, 7.5f, 0f), 0.2f, Color.white).transform;
             worldBillboards.Add(marker);
 
             var structuresRoot = new GameObject("Structures").transform;
@@ -449,9 +458,14 @@ namespace Topoda.RLS.Observer
                 CreatePrimitive(PrimitiveType.Cube, building, "HQ Entry", new Vector3(0f, -0.31f, 0.508f), new Vector3(0.18f, 0.34f, 0.024f), materials.Road, false);
             }
 
-            if (materials.CityHallDome != null)
+            if (materials.CityHallBase != null)
             {
-                CreatePrimitive(PrimitiveType.Cube, building, "HQ Roof Trim", new Vector3(0f, 0.49f, 0f), new Vector3(1.04f, 0.035f, 1.04f), materials.CityHallDome, false);
+                CreatePrimitive(PrimitiveType.Cube, building, "Production flat roof", new Vector3(0f, 0.51f, 0f), new Vector3(1.05f, 0.07f, 1.05f), materials.CityHallBase, false);
+                // The existing fixture combines three production occupations.
+                // Roof pods express that work capacity without assigning it a
+                // new canonical Structure type or putting identity on walls.
+                for (int index = -1; index <= 1; index++)
+                    CreatePrimitive(PrimitiveType.Cube, building, "Production roof pod", new Vector3(index * 0.28f, 0.60f, 0f), new Vector3(0.19f, 0.16f, 0.56f), materials.CityHallBase, false);
             }
         }
 
@@ -473,11 +487,8 @@ namespace Topoda.RLS.Observer
         private void UpdateLabelVisual(LabelVisual visual, LabelRecord label, WorldSnapshot snapshot)
         {
             Color baseColor = ParseHexColor(label.ColorHex);
-            float reputationScale = 0.85f + label.Reputation / 220f;
-            float chartScale = 0.85f + label.ChartScore / 1800f;
-            float height = Mathf.Clamp(4f * reputationScale, 3.5f, 14f);
-            float footprint = Mathf.Clamp(5.5f * chartScale, 5f, 9f);
-            visual.Headquarters.localScale = new Vector3(footprint, height, footprint);
+            const float height = 5f;
+            visual.Headquarters.localScale = new Vector3(12f, height, 10f);
             visual.Headquarters.localPosition = new Vector3(0f, height * 0.5f, 0f);
 
             if (visual.HeadquartersMaterial == null)
@@ -486,12 +497,11 @@ namespace Topoda.RLS.Observer
                 visual.HeadquartersRenderer.sharedMaterial = visual.HeadquartersMaterial;
             }
 
-            SetStandardColor(visual.HeadquartersMaterial, Color.Lerp(baseColor, Color.white, 0.08f));
-            ApplyNationHeadquartersFinish(visual.HeadquartersMaterial, label.Nation);
+            SetStandardColor(visual.HeadquartersMaterial, GetStandardColor(materials.StructureBase));
 
             visual.Marker.localPosition = new Vector3(0f, height + 3.6f, 0f);
             visual.MarketCode = label.MarketCode;
-            visual.DisplayName = label.Name;
+            visual.DisplayName = "Production Structure";
             TextMesh text = visual.Marker.GetComponent<TextMesh>();
             if (text != null)
             {
@@ -544,7 +554,9 @@ namespace Topoda.RLS.Observer
                 }
             }
 
-            for (int index = 0; index < structures.Count; index++)
+            // The first record is the visible main building, not a separate
+            // label HQ. Only additional real Structure records create annexes.
+            for (int index = 1; index < structures.Count; index++)
             {
                 float angle = (Mathf.PI * 2f * index) / Mathf.Max(1, structures.Count);
                 float radius = visual.Headquarters.localScale.x * 0.85f + 3.5f;
@@ -553,7 +565,7 @@ namespace Topoda.RLS.Observer
                 Vector3 scale = new Vector3(2.8f, 2.4f + occupancy * 2f, 2.8f);
                 Material structureMaterial = Instantiate(materials.StructureBase);
                 SetStandardColor(structureMaterial, Color.Lerp(GetStandardColor(materials.StructureBase), baseColor, 0.22f));
-                GameObject block = CreatePrimitive(PrimitiveType.Cube, visual.StructuresRoot, structures[index].Kind ?? "Structure", localPosition, scale, structureMaterial, false);
+                GameObject block = CreatePrimitive(PrimitiveType.Cube, visual.StructuresRoot, structures[index].Kind ?? "Structure", localPosition, scale, structureMaterial, true);
                 visual.StructureBlocks.Add(block.GetComponent<Renderer>());
 
                 int windowRows = 2 + Mathf.RoundToInt(occupancy * 3f);
@@ -603,12 +615,13 @@ namespace Topoda.RLS.Observer
                 bool selected = pair.Key == selectedLabelId;
                 if (selected)
                 {
-                    float pulse = 1.1f + Mathf.Sin(selectedEmissionPulse * 4f) * 0.12f;
-                    SetEmissive(pair.Value.HeadquartersMaterial, new Color(0.45f, 0.85f, 1f), 220f * pulse);
+                    SetEmissive(pair.Value.HeadquartersMaterial, Color.black, 0f);
+                    TextMesh marker = pair.Value.Marker.GetComponent<TextMesh>();
+                    if (marker != null) marker.color = new Color(0.75f, 0.9f, 1f);
                 }
                 else
                 {
-                    ApplyNationHeadquartersFinish(pair.Value.HeadquartersMaterial, pair.Value.Nation);
+                    SetEmissive(pair.Value.HeadquartersMaterial, Color.black, 0f);
                 }
 
             }

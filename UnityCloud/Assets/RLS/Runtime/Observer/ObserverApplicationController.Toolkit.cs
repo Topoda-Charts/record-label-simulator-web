@@ -14,11 +14,13 @@ namespace Topoda.RLS.Observer
         private bool toolkitPicker;
         private bool inspectorOpen;
         private bool eventHistoryOpen;
+        private ApplicationState settingsReturnState = ApplicationState.MainMenu;
         private Label clockLabel, transportLabel, saveLabel, errorLabel, inspectorTitle, inspectorSubtitle;
         private Button pauseButton;
         private ProgressBar loadProgress;
         private ScrollView eventList, workList;
         private readonly Dictionary<string, Label> metricLabels = new Dictionary<string, Label>();
+        private readonly Dictionary<Button, bool> skipSensitiveButtons = new Dictionary<Button, bool>();
         private float nextUiRefresh;
         private long renderedStep = -1;
         private string renderedLabel, renderedFilter;
@@ -53,6 +55,8 @@ namespace Topoda.RLS.Observer
             var sheet = Resources.Load<StyleSheet>("ObserverShell");
             if (sheet != null) toolkitRoot.styleSheets.Add(sheet);
             toolkitRoot.AddToClassList("root");
+            toolkitRoot.RegisterCallback<KeyDownEvent>(HandleObserverToolkitKeyDown, TrickleDown.TrickleDown);
+            InitializeObserverStatistics();
         }
 
         private void OnDestroy()
@@ -61,6 +65,16 @@ namespace Topoda.RLS.Observer
         }
 
         private bool ToolkitHasFocus() => toolkitRoot?.panel?.focusController?.focusedElement != null;
+
+        private void HandleObserverToolkitKeyDown(KeyDownEvent evt)
+        {
+            if (state == ApplicationState.Observer && developerDiagnosticsEnabled && evt.keyCode == KeyCode.Tab &&
+                evt.modifiers == EventModifiers.None && !ToolkitHasFocus())
+            {
+                evt.PreventDefault();
+                evt.StopPropagation();
+            }
+        }
 
         private bool ToolkitContainsPointer(Vector2 screenPoint)
         {
@@ -74,6 +88,7 @@ namespace Topoda.RLS.Observer
         private void UpdateToolkit()
         {
             if (toolkitRoot == null) return;
+            if (state != ApplicationState.Observer) developerDiagnosticsOpen = false;
             toolkitPanel.scale = textScale;
             toolkitRoot.EnableInClassList("high-contrast", highContrast);
             bool compactViewport = Screen.width < 1180 || Screen.height < 720;
@@ -96,6 +111,8 @@ namespace Topoda.RLS.Observer
             }
             if (Time.unscaledTime < nextUiRefresh) return;
             nextUiRefresh = Time.unscaledTime + 0.15f;
+            RefreshSkipProgressToolkit();
+            RefreshSkipSensitiveControls();
             if (errorLabel != null)
             {
                 errorLabel.text = plainLanguageError;
@@ -113,6 +130,8 @@ namespace Topoda.RLS.Observer
             saveLabel.text = statusMessage;
             RefreshProductionTray();
             RefreshMemberInspector();
+            RefreshObserverStatistics();
+            RefreshDeveloperDiagnostics();
             if (renderedStep == simulation.World.Clock.StepIndex && renderedLabel == selectedLabelId && renderedFilter == eventFilter) return;
             renderedStep = simulation.World.Clock.StepIndex;
             renderedLabel = selectedLabelId;
@@ -123,8 +142,23 @@ namespace Topoda.RLS.Observer
         private void RebuildToolkit()
         {
             toolkitRoot.Clear();
-            toolkitRoot.EnableInClassList("production-open", productionTrayOpen);
             metricLabels.Clear();
+            skipSensitiveButtons.Clear();
+            observerStatLabels.Clear();
+            observerStatRows.Clear();
+            developerDiagnosticLines.Clear();
+            skipProgressPanel = null;
+            skipProgressBar = null;
+            skipProgressCaption = null;
+            if (state == ApplicationState.MainMenu || state == ApplicationState.Loading || state == ApplicationState.Splash)
+            {
+                statsPanelOpen = false;
+                inspectorOpen = false;
+                eventHistoryOpen = false;
+                productionTrayOpen = false;
+            }
+            toolkitRoot.EnableInClassList("production-open", productionTrayOpen);
+            if (state != ApplicationState.Observer) developerDiagnosticsOpen = false;
             renderedStep = -1;
             renderedLabel = null;
             renderedEventsKey = null;
@@ -133,6 +167,8 @@ namespace Topoda.RLS.Observer
             if (showSnapshotPicker) BuildSnapshotToolkit();
             errorLabel = Text(toolkitRoot, plainLanguageError, "error-banner");
             errorLabel.style.display = string.IsNullOrEmpty(plainLanguageError) ? DisplayStyle.None : DisplayStyle.Flex;
+            RefreshSkipSensitiveControls();
+            RefreshSkipProgressToolkit();
         }
 
         private void BuildApplicationToolkit()
@@ -152,7 +188,7 @@ namespace Topoda.RLS.Observer
                     ActionButton(card, "Open Aug 31 Handoff", () => BeginObserver(ObserverMode.OpenHandoff));
                     ActionButton(card, "Load Snapshot", OpenSnapshotToolkit);
                     var row = Box(card, "row");
-                    ActionButton(row, "Settings", () => state = ApplicationState.Settings);
+                    ActionButton(row, "Settings", OpenToolkitSettings);
                     ActionButton(row, "Credits", () => state = ApplicationState.Credits);
                     ActionButton(card, "Exit", ExitCleanly);
                     Text(card, "CENTRAL BLOOMVILLE  /  2425\nOffline play · Local snapshots", "muted");
@@ -171,8 +207,13 @@ namespace Topoda.RLS.Observer
                     motion.RegisterValueChangedCallback(e => reducedMotion = e.newValue); card.Add(motion);
                     var contrast = new Toggle("High contrast") { value = highContrast };
                     contrast.RegisterValueChangedCallback(e => highContrast = e.newValue); card.Add(contrast);
-                    Text(card, "Tab selects controls · Enter activates\nWorld: WASD / arrows pan · Q/E orbit · wheel zoom\nSpace pauses · N steps · Home returns to overview", "muted");
-                    ActionButton(card, "Back", () => state = ApplicationState.MainMenu);
+                    Text(card, "Developer diagnostics", "section-title");
+                    var diagnostics = new Toggle("Enable developer diagnostics (Tab)") { value = developerDiagnosticsEnabled };
+                    diagnostics.RegisterValueChangedCallback(e => SetDeveloperDiagnosticsEnabled(e.newValue));
+                    card.Add(diagnostics);
+                    Text(card, "After opting in, Tab opens or closes a read-only overlay in Observer. Player menus keep normal Tab navigation.", "muted");
+                    Text(card, "Tab selects controls · Enter activates\nWorld: WASD / arrows pan · Q/E orbit · wheel zoom\nSpace pauses · Home returns to overview", "muted");
+                    ActionButton(card, "Back", CloseToolkitSettings);
                     break;
                 case ApplicationState.Credits:
                     Text(card, "Created by JL / Tópoda Charts Studios\n\nImplementation support: Codex / OpenAI\nPowered by Unity", "body-copy");
@@ -193,23 +234,25 @@ namespace Topoda.RLS.Observer
             var clock = Box(center, "clock row");
             clockLabel = Text(clock, "", "clock-text");
             transportLabel = Text(clock, "", "eyebrow");
-            pauseButton = ActionButton(center, "Play", TogglePause, "primary");
-            ActionButton(center, "Step", () => { SafeAutosave("before single step"); simulation.SingleStep(); RefreshWorldPresenter(true); });
-            foreach (int speed in new[] { 1, 4, 16 }) { int value = speed; ActionButton(center, "×" + speed, () => SetSpeed(value)); }
-            ActionButton(center, "Skip 1 day", () => Skip(TimeSpan.FromDays(1)));
-            ActionButton(center, "Skip 1 week", () => Skip(TimeSpan.FromDays(7)));
+            pauseButton = SkipBlockedButton(center, "Play", TogglePause, "primary");
+            foreach (int speed in new[] { 1, 2, 4 }) { int value = speed; SkipBlockedButton(center, "×" + speed, () => SetSpeed(value)); }
+            SkipBlockedButton(center, "Skip 1 day", () => RequestObserverSkip(TimeSpan.FromDays(1)));
+            SkipBlockedButton(center, "Skip 1 week", () => RequestObserverSkip(TimeSpan.FromDays(7)));
             ActionButton(center, "Production", () => { productionTrayOpen = !productionTrayOpen; RebuildToolkit(); }, productionTrayOpen ? "primary" : "");
 
             var right = Box(bar, "topbar-right");
             saveLabel = Text(right, statusMessage, "topbar-save-status");
-            ActionButton(right, "Snapshots", OpenSnapshotToolkit);
-            ActionButton(right, "Settings", () => state = ApplicationState.Settings);
-            ActionButton(right, "Inspect", () => { inspectorOpen = !inspectorOpen; RebuildToolkit(); }, inspectorOpen ? "primary" : "");
-            ActionButton(right, "Menu", ReturnToMenu);
+            SkipBlockedButton(right, "Snapshots", OpenSnapshotToolkit);
+            SkipBlockedButton(right, "Settings", OpenToolkitSettings);
+            ActionButton(right, "Stats", () => { statsPanelOpen = !statsPanelOpen; if (statsPanelOpen) inspectorOpen = false; RebuildToolkit(); }, statsPanelOpen ? "primary" : "");
+            ActionButton(right, "Inspect", () => { inspectorOpen = !inspectorOpen; if (inspectorOpen) statsPanelOpen = false; RebuildToolkit(); }, inspectorOpen ? "primary" : "");
+            SkipBlockedButton(right, "Menu", ReturnToMenu);
 
             if (productionTrayOpen) BuildProductionTray(toolkitRoot);
 
-            if (inspectorOpen)
+            if (statsPanelOpen) BuildObserverStatisticsPanel(toolkitRoot);
+
+            if (inspectorOpen && !statsPanelOpen)
             {
                 if (!string.IsNullOrEmpty(selectedMemberId) && BuildMemberInspector(toolkitRoot))
                 {
@@ -237,15 +280,15 @@ namespace Topoda.RLS.Observer
                     var saves = new Foldout { text = "Snapshots & recovery", value = false }; scroll.Add(saves);
                     var name = new TextField("Name") { value = snapshotName };
                     name.RegisterValueChangedCallback(e => snapshotName = e.newValue); saves.Add(name);
-                    ActionButton(saves, "Create named snapshot", SaveNamedSnapshot, "primary");
-                    var tools = Box(saves, "row"); ActionButton(tools, "Load snapshots", OpenSnapshotToolkit);
-                    ActionButton(tools, "Reset", ResetWorld);
+                    SkipBlockedButton(saves, "Create named snapshot", SaveNamedSnapshot, "primary");
+                    var tools = Box(saves, "row"); SkipBlockedButton(tools, "Load snapshots", OpenSnapshotToolkit);
+                    SkipBlockedButton(tools, "Reset", ResetWorld);
                 }
             }
             else { inspectorTitle = null; inspectorSubtitle = null; workList = null; }
 
             var feed = Box(toolkitRoot, "event-feed light-panel");
-            feed.EnableInClassList("wide-feed", !inspectorOpen);
+            feed.EnableInClassList("wide-feed", !inspectorOpen && !statsPanelOpen);
             feed.EnableInClassList("history-open", eventHistoryOpen);
             var header = Box(feed, "event-header row");
             Text(header, eventHistoryOpen ? "WORLD HISTORY" : "LATEST EVENTS", "feed-title");
@@ -260,6 +303,8 @@ namespace Topoda.RLS.Observer
                 }
             }
             eventList = new ScrollView(ScrollViewMode.Vertical); feed.Add(eventList);
+            BuildSkipProgressToolkit(toolkitRoot);
+            BuildDeveloperDiagnosticsOverlay(toolkitRoot);
         }
 
         private void RefreshToolkitInspection()
@@ -298,31 +343,71 @@ namespace Topoda.RLS.Observer
 
         private void OpenSnapshotToolkit()
         {
+            if (skipInProgress) return;
             if (simulation != null) { simulation.World.Clock.Paused = true; simulation.RefreshDigest(); }
             snapshotList = snapshots.List(); showSnapshotPicker = true;
         }
 
         private void BuildSnapshotToolkit()
         {
+            if (skipInProgress) return;
             var modal = Box(toolkitRoot, "backdrop modal");
             var card = Box(modal, "menu-card light-panel");
             Text(card, "Load a local snapshot", "section-title");
             Text(card, "Your current world is protected before loading.", "muted");
             var name = new TextField("Snapshot name") { value = snapshotName };
             name.RegisterValueChangedCallback(e => snapshotName = e.newValue); card.Add(name);
-            ActionButton(card, "Create named snapshot", SaveNamedSnapshot, "primary");
+            SkipBlockedButton(card, "Create named snapshot", SaveNamedSnapshot, "primary");
             var list = new ScrollView(ScrollViewMode.Vertical); list.AddToClassList("snapshot-list"); card.Add(list);
             if (snapshotList.Count == 0) Text(list, "No snapshots yet. Watch the world grow to create one.", "body-copy");
             foreach (var item in snapshotList)
             {
                 string file = item.FileName;
-                var button = ActionButton(list, item.DisplayName + "\n" + ObserverDisplayFormat.SnapshotDate(item) + " · " + item.Compatibility, () => LoadSnapshot(file));
-                button.SetEnabled(item.IntegrityValid);
+                SkipBlockedButton(list, item.DisplayName + "\n" + ObserverDisplayFormat.SnapshotDate(item) + " · " + item.Compatibility,
+                    () => LoadSnapshot(file), enabled: item.IntegrityValid);
             }
             ActionButton(card, "Close", () => showSnapshotPicker = false);
         }
 
         private void SetMetric(string key, string value) { if (metricLabels.TryGetValue(key, out var label)) label.text = value; }
+
+        private Button SkipBlockedButton(VisualElement parent, string text, Action action, string classes = "", bool enabled = true)
+        {
+            var button = ActionButton(parent, text, action, classes);
+            button.SetEnabled(enabled && !skipInProgress);
+            skipSensitiveButtons.Add(button, enabled);
+            return button;
+        }
+
+        private void RefreshSkipSensitiveControls()
+        {
+            foreach (var entry in skipSensitiveButtons)
+            {
+                if (entry.Key != null) entry.Key.SetEnabled(entry.Value && !skipInProgress);
+            }
+        }
+
+        private void RequestObserverSkip(TimeSpan duration)
+        {
+            if (skipInProgress) return;
+            Skip(duration);
+            RefreshSkipSensitiveControls();
+            RefreshSkipProgressToolkit();
+        }
+
+        private void OpenToolkitSettings()
+        {
+            if (skipInProgress) return;
+            settingsReturnState = state;
+            developerDiagnosticsOpen = false;
+            state = ApplicationState.Settings;
+        }
+
+        private void CloseToolkitSettings()
+        {
+            state = settingsReturnState;
+        }
+
         private static VisualElement Box(VisualElement parent, string classes)
         { var box = new VisualElement(); foreach (var c in classes.Split(' ')) box.AddToClassList(c); parent.Add(box); return box; }
         private static Label Text(VisualElement parent, string value, string classes)

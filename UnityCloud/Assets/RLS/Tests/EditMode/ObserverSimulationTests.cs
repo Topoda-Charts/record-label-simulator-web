@@ -280,7 +280,7 @@ namespace Topoda.RLS.Tests.EditMode
         }
 
         [Test]
-        public void WorldPresenterBuildsEightLabelHeadquarters()
+        public void NeighborhoodShowsLocalStructuresAndKeepsOrganizationsInSimulation()
         {
             DeterministicSimulation simulation = Create();
             var presenterObject = new GameObject("Bloomville Presenter Test");
@@ -289,7 +289,10 @@ namespace Topoda.RLS.Tests.EditMode
                 BloomvilleWorldPresenter presenter = presenterObject.AddComponent<BloomvilleWorldPresenter>();
                 presenter.SetMaterials(CreateTestMaterialSet());
                 presenter.RefreshFromSnapshot(simulation.World);
-                Assert.That(presenter.LabelHeadquarterCount, Is.EqualTo(8));
+                Assert.That(presenter.DisplayedProductionStructureCount, Is.EqualTo(3));
+                Assert.That(simulation.World.Labels.Count, Is.EqualTo(8));
+                Assert.That(presenter.TryGetLabelAnchor("ARL1", out _), Is.True);
+                Assert.That(presenter.TryGetLabelAnchor("BRL1", out _), Is.False);
             }
             finally
             {

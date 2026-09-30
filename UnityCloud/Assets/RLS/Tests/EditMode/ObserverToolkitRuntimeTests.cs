@@ -56,7 +56,7 @@ namespace Topoda.RLS.Tests.EditMode
             for (int i = 0; i < 10; i++) yield return null;
             Assert.That(controller.Simulation.World.Clock.StepIndex, Is.EqualTo(step));
             var presenter = Object.FindAnyObjectByType<BloomvilleWorldPresenter>();
-            Assert.That(presenter.LabelHeadquarterCount, Is.EqualTo(8));
+            Assert.That(presenter.DisplayedProductionStructureCount, Is.EqualTo(3));
             string capture = Path.GetFullPath(Path.Combine(Application.dataPath, "../TestResults/modernization-playmode.png"));
             ScreenCapture.CaptureScreenshot(capture);
             for (int i = 0; i < 20; i++) yield return null;

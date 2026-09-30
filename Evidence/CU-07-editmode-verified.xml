@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="27" result="Passed" total="27" passed="27" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-09-30 22:53:59Z" end-time="2026-09-30 22:54:01Z" duration="1.9693602">
+  <test-suite type="TestSuite" id="1000" name="RLS Gaia Observer" fullname="RLS Gaia Observer" runstate="Runnable" testcasecount="27" result="Passed" start-time="2026-09-30 22:53:59Z" end-time="2026-09-30 22:54:01Z" duration="1.969360" total="27" passed="27" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <test-suite type="Assembly" id="1034" name="RLS.Tests.EditMode.dll" fullname="C:/dev/record-label-simulator-web/UnityCloud/Library/ScriptAssemblies/RLS.Tests.EditMode.dll" runstate="Runnable" testcasecount="27" result="Passed" start-time="2026-09-30 22:53:59Z" end-time="2026-09-30 22:54:01Z" duration="1.527505" total="27" passed="27" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="25976" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <test-suite type="TestSuite" id="1035" name="Topoda" fullname="Topoda" runstate="Runnable" testcasecount="27" result="Passed" start-time="2026-09-30 22:53:59Z" end-time="2026-09-30 22:54:01Z" duration="1.525173" total="27" passed="27" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="TestSuite" id="1036" name="RLS" fullname="Topoda.RLS" runstate="Runnable" testcasecount="27" result="Passed" start-time="2026-09-30 22:53:59Z" end-time="2026-09-30 22:54:01Z" duration="1.524077" total="27" passed="27" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-suite type="TestSuite" id="1037" name="Tests" fullname="Topoda.RLS.Tests" runstate="Runnable" testcasecount="27" result="Passed" start-time="2026-09-30 22:53:59Z" end-time="2026-09-30 22:54:01Z" duration="1.523543" total="27" passed="27" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-suite type="TestSuite" id="1038" name="EditMode" fullname="Topoda.RLS.Tests.EditMode" runstate="Runnable" testcasecount="25" result="Passed" start-time="2026-09-30 22:53:59Z" end-time="2026-09-30 22:54:01Z" duration="1.496487" total="25" passed="25" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-suite type="TestFixture" id="1004" name="BloomvilleMemberProxiesTests" fullname="Topoda.RLS.Tests.EditMode.BloomvilleMemberProxiesTests" classname="Topoda.RLS.Tests.EditMode.BloomvilleMemberProxiesTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-09-30 22:53:16Z" end-time="2026-09-30 22:53:16Z" duration="0.237278" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+                <properties />
+                <test-case id="1006" name="ReleaseEventPulseMapsTrackSubjectToLabel" fullname="Topoda.RLS.Tests.EditMode.BloomvilleMemberProxiesTests.ReleaseEventPulseMapsTrackSubjectToLabel" methodname="ReleaseEventPulseMapsTrackSubjectToLabel" classname="Topoda.RLS.Tests.EditMode.BloomvilleMemberProxiesTests" runstate="Runnable" seed="801478977" result="Passed" start-time="2026-09-30 22:53:16Z" end-time="2026-09-30 22:53:16Z" duration="0.062000" asserts="0">
+                  <properties />
+                </test-case>
+                <test-case id="1005" name="SampleSelectionRespectsCapAndStableOrdering" fullname="Topoda.RLS.Tests.EditMode.BloomvilleMemberProxiesTests.SampleSelectionRespectsCapAndStableOrdering" methodname="SampleSelectionRespectsCapAndStableOrdering" classname="Topoda.RLS.Tests.EditMode.BloomvilleMemberProxiesTests" runstate="Runnable" seed="1001240085" result="Passed" start-time="2026-09-30 22:53:16Z" end-time="2026-09-30 22:53:16Z" duration="0.126014" asserts="0">
+                  <properties />
+                </test-case>
+              </test-suite>
+              <test-suite type="TestFixture" id="1007" name="BloomvilleMemberProxyAvoidanceTests" fullname="Topoda.RLS.Tests.EditMode.BloomvilleMemberProxyAvoidanceTests" classname="Topoda.RLS.Tests.EditMode.BloomvilleMemberProxyAvoidanceTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-09-30 22:53:16Z" end-time="2026-09-30 22:53:16Z" duration="0.024351" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+                <properties />
+                <test-case id="1009" name="BlockedFallbackSearchFindsOnlySafeStreetPointAndHasFiniteBound" fullname="Topoda.RLS.Tests.EditMode.BloomvilleMemberProxyAvoidanceTests.BlockedFallbackSearchFindsOnlySafeStreetPointAndHasFiniteBound" methodname="BlockedFallbackSearchFindsOnlySafeStreetPointAndHasFiniteBound" classname="Topoda.RLS.Tests.EditMode.BloomvilleMemberProxyAvoidanceTests" runstate="Runnable" seed="1392942754" result="Passed" start-time="2026-09-30 22:53:16Z" end-time="2026-09-30 22:53:16Z" duration="0.012090" asserts="0">
+                  <properties />
+                </test-case>
+                <test-case id="1008" name="ForcedOverlapSeparatesWithStableHorizontalTieBreak" fullname="Topoda.RLS.Tests.EditMode.BloomvilleMemberProxyAvoidanceTests.ForcedOverlapSeparatesWithStableHorizontalTieBreak" methodname="ForcedOverlapSeparatesWithStableHorizontalTieBreak" classname="Topoda.RLS.Tests.EditMode.BloomvilleMemberProxyAvoidanceTests" runstate="Runnable" seed="89319119" result="Passed" start-time="2026-09-30 22:53:16Z" end-time="2026-09-30 22:53:16Z" duration="0.009204" asserts="0">
+                  <properties />
+                </test-case>
+              </test-suite>
+              <test-suite type="TestFixture" id="1010" name="CloudTimelineTests" fullname="Topoda.RLS.Tests.EditMode.CloudTimelineTests" classname="Topoda.RLS.Tests.EditMode.CloudTimelineTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-09-30 22:53:16Z" end-time="2026-09-30 22:53:24Z" duration="8.240837" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+                <properties />
+                <test-case id="1011" name="SeptemberObservationContinuesFromAugustHandoffWithSameAuthoritativeState" fullname="Topoda.RLS.Tests.EditMode.CloudTimelineTests.SeptemberObservationContinuesFromAugustHandoffWithSameAuthoritativeState" methodname="SeptemberObservationContinuesFromAugustHandoffWithSameAuthoritativeState" classname="Topoda.RLS.Tests.EditMode.CloudTimelineTests" runstate="Runnable" seed="104034377" result="Passed" start-time="2026-09-30 22:53:16Z" end-time="2026-09-30 22:53:24Z" duration="8.237896" asserts="0">
+                  <properties />
+                  <output><![CDATA[RLS_SEPTEMBER_VALIDATED digest=6a1ae039168471a00a576269a65d6f0700b6120d2009e95c41fff5381df8dedb snapshotBytes=835839
+]]></output>
+                </test-case>
+              </test-suite>
+              <test-suite type="TestFixture" id="1012" name="ObserverSimulationTests" fullname="Topoda.RLS.Tests.EditMode.ObserverSimulationTests" classname="Topoda.RLS.Tests.EditMode.ObserverSimulationTests" runstate="Runnable" testcasecount="18" result="Passed" start-time="2026-09-30 22:53:24Z" end-time="2026-09-30 22:53:49Z" duration="24.893276" total="18" passed="18" failed="0" inconclusive="0" skipped="0" asserts="0">
+                <properties />
+                <test-case id="1022" name="AtomicAutosavesRotateAndLeaveNoWritingResidue" fullname="Topoda.RLS.Tests.EditMode.ObserverSimulationTests.AtomicAutosavesRotateAndLeaveNoWritingResidue" methodname="AtomicAutosavesRotateAndLeaveNoWritingResidue" classname="Topoda.RLS.Tests.EditMode.ObserverSimulationTests" runstate="Runnable" seed="1096147608" result="Passed" start-time="2026-09-30 22:53:24Z" end-time="2026-09-30 22:53:24Z" duration="0.181088" asserts="0">
+                  <properties />
+                </test-case>
+                <test-case id="1030" name="BrandObserverSceneAndFrozenPackageSourcesArePresent" fullname="Topoda.RLS.Tests.EditMode.ObserverSimulationTests.BrandObserverSceneAndFrozenPackageSourcesArePresent" methodname="BrandObserverSceneAndFrozenPackageSourcesArePresent" classname="Topoda.RLS.Tests.EditMode.ObserverSimulationTests" runstate="Runnable" seed="841845850" result="Passed" start-time="2026-09-30 22:53:24Z" end-time="2026-09-30 22:53:24Z" duration="0.012990" asserts="0">
+                  <properties />
+                </test-case>
+                <test-case id="1025" name="ConsequentialEventsAreBoundedUniqueAndCanonicallyOrdered" fullname="Topoda.RLS.Tests.EditMode.ObserverSimulationTests.ConsequentialEventsAreBoundedUniqueAndCanonicallyOrdered" methodname="ConsequentialEventsAreBoundedUniqueAndCanonicallyOrdered" classname="Topoda.RLS.Tests.EditMode.ObserverSimulationTests" runstate="Runnable" seed="991014820" result="Passed" start-time="2026-09-30 22:53:24Z" end-time="2026-09-30 22:53:29Z" duration="4.136226" asserts="0">
+                  <properties />
+                </test-case>
+                <test-case id="1023" name="CorruptAndIncompatibleSnapshotsFailWithoutChangingCurrentWorld" fullname="Topoda.RLS.Tests.EditMode.ObserverSimulationTests.CorruptAndIncompatibleSnapshotsFailWithoutChangingCurrentWorld" methodname="CorruptAndIncompatibleSnapshotsFailWithoutChangingCurrentWorld" classname="Topoda.RLS.Tests.EditMode.ObserverSimulationTests" runstate="Runnable" seed="1555609920" result="Passed" start-time="2026-09-30 22:53:29Z" end-time="2026-09-30 22:53:29Z" duration="0.036629" asserts="0">
+                  <properties />
+                </test-case>
+                <test-case id="1017" name="DigestIsSensitiveToEveryPersistedRecordFamily" fullname="Topoda.RLS.Tests.EditMode.ObserverSimulationTests.DigestIsSensitiveToEveryPersistedRecordFamily" methodname="DigestIsSensitiveToEveryPersistedRecordFamily" classname="Topoda.RLS.Tests.EditMode.ObserverSimulationTests" runstate="Runnable" seed="1025046044" result="Passed" start-time="2026-09-30 22:53:29Z" end-time="2026-09-30 22:53:30Z" duration="1.117000" asserts="0">
+                  <properties />
+                </test-case>
+                <test-case id="1015" name="FixedStepsAndBatchedAdvancementConverge" fullname="Topoda.RLS.Tests.EditMode.ObserverSimulationTests.FixedStepsAndBatchedAdvancementConverge" methodname="FixedStepsAndBatchedAdvancementConverge" classname="Topoda.RLS.Tests.EditMode.ObserverSimulationTests" runstate="Runnable" seed="899396546" result="Passed" start-time="2026-09-30 22:53:30Z" end-time="2026-09-30 22:53:35Z" duration="4.913695" asserts="0">
+                  <properties />
+                </test-case>
+                <test-case id="1019" name="JanToAugustAndColdHandoffConvergeWithinBudget" fullname="Topoda.RLS.Tests.EditMode.ObserverSimulationTests.JanToAugustAndColdHandoffConvergeWithinBudget" methodname="JanToAugustAndColdHandoffConvergeWithinBudget" classname="Topoda.RLS.Tests.EditMode.ObserverSimulationTests" runstate="Runnable" seed="449027604" result="Passed" start-time="2026-09-30 22:53:35Z" end-time="2026-09-30 22:53:46Z" duration="11.440884" asserts="0">
+                  <properties />
+                  <output><![CDATA[Cold Aug 31 generation: 2.270 seconds; digest=bdc54371d0f88846bb238ea8386b167cd173d0e4025ddca399637067c0acca31
+]]></output>
+                </test-case>
+                <test-case id="1024" name="LifecyclePreservesEachOutputAndDoesNotRequireAnAct" fullname="Topoda.RLS.Tests.EditMode.ObserverSimulationTests.LifecyclePreservesEachOutputAndDoesNotRequireAnAct" methodname="LifecyclePreservesEachOutputAndDoesNotRequireAnAct" classname="Topoda.RLS.Tests.EditMode.ObserverSimulationTests" runstate="Runnable" seed="1644297211" result="Passed" start-time="2026-09-30 22:53:46Z" end-time="2026-09-30 22:53:46Z" duration="0.079850" asserts="0">
+                  <properties />
+                </test-case>
+                <test-case id="1014" name="MainMenuIsDirectAndHasNoModeSelectionOrManagementRoute" fullname="Topoda.RLS.Tests.EditMode.ObserverSimulationTests.MainMenuIsDirectAndHasNoModeSelectionOrManagementRoute" methodname="MainMenuIsDirectAndHasNoModeSelectionOrManagementRoute" classname="Topoda.RLS.Tests.EditMode.ObserverSimulationTests" runstate="Runnable" seed="1031413676" result="Passed" start-time="2026-09-30 22:53:46Z" end-time="2026-09-30 22:53:46Z" duration="0.006441" asserts="0">
+                  <properties />
+                </test-case>
+                <test-case id="1029" name="NeighborhoodShowsLocalStructuresAndKeepsOrganizationsInSimulation" fullname="Topoda.RLS.Tests.EditMode.ObserverSimulationTests.NeighborhoodShowsLocalStructuresAndKeepsOrganizationsInSimulation" methodname="NeighborhoodShowsLocalStructuresAndKeepsOrganizationsInSimulation" classname="Topoda.RLS.Tests.EditMode.ObserverSimulationTests" runstate="Runnable" seed="1633409508" result="Passed" start-time="2026-09-30 22:53:46Z" end-time="2026-09-30 22:53:47Z" duration="0.467636" asserts="0">
+                  <properties />
+                </test-case>
+                <test-case id="1026" name="ObserverQueriesReturnDetachedReadOnlyProjections" fullname="Topoda.RLS.Tests.EditMode.ObserverSimulationTests.ObserverQueriesReturnDetachedReadOnlyProjections" methodname="ObserverQueriesReturnDetachedReadOnlyProjections" classname="Topoda.RLS.Tests.EditMode.ObserverSimulationTests" runstate="Runnable" seed="1020254343" result="Passed" start-time="2026-09-30 22:53:47Z" end-time="2026-09-30 22:53:47Z" duration="0.005705" asserts="0">
+                  <properties />
+                </test-case>
+                <test-case id="1027" name="OptionalCloudAdapterIsDisabledAndIsolated" fullname="Topoda.RLS.Tests.EditMode.ObserverSimulationTests.OptionalCloudAdapterIsDisabledAndIsolated" methodname="OptionalCloudAdapterIsDisabledAndIsolated" classname="Topoda.RLS.Tests.EditMode.ObserverSimulationTests" runstate="Runnable" seed="869842418" result="Passed" start-time="2026-09-30 22:53:47Z" end-time="2026-09-30 22:53:47Z" duration="0.002444" asserts="0">
+                  <properties />
+                </test-case>
+                <test-case id="1018" name="PresentationFiltersAndCameraStateAreOutsideAuthoritativeSnapshot" fullname="Topoda.RLS.Tests.EditMode.ObserverSimulationTests.PresentationFiltersAndCameraStateAreOutsideAuthoritativeSnapshot" methodname="PresentationFiltersAndCameraStateAreOutsideAuthoritativeSnapshot" classname="Topoda.RLS.Tests.EditMode.ObserverSimulationTests" runstate="Runnable" seed="174434891" result="Passed" start-time="2026-09-30 22:53:47Z" end-time="2026-09-30 22:53:47Z" duration="0.001389" asserts="0">
+                  <properties />
+                </test-case>
+                <test-case id="1016" name="SameSeedRepeatsWithStablePerSystemRandomStreams" fullname="Topoda.RLS.Tests.EditMode.ObserverSimulationTests.SameSeedRepeatsWithStablePerSystemRandomStreams" methodname="SameSeedRepeatsWithStablePerSystemRandomStreams" classname="Topoda.RLS.Tests.EditMode.ObserverSimulationTests" runstate="Runnable" seed="224355229" result="Passed" start-time="2026-09-30 22:53:47Z" end-time="2026-09-30 22:53:47Z" duration="0.155180" asserts="0">
+                  <properties />
+                </test-case>
+                <test-case id="1021" name="SaveAdvanceLoadRestoresFullDigest" fullname="Topoda.RLS.Tests.EditMode.ObserverSimulationTests.SaveAdvanceLoadRestoresFullDigest" methodname="SaveAdvanceLoadRestoresFullDigest" classname="Topoda.RLS.Tests.EditMode.ObserverSimulationTests" runstate="Runnable" seed="1988552579" result="Passed" start-time="2026-09-30 22:53:47Z" end-time="2026-09-30 22:53:47Z" duration="0.045187" asserts="0">
+                  <properties />
+                </test-case>
+                <test-case id="1013" name="ScenarioUsesExactAnchorsAndFormulaicGenericLabels" fullname="Topoda.RLS.Tests.EditMode.ObserverSimulationTests.ScenarioUsesExactAnchorsAndFormulaicGenericLabels" methodname="ScenarioUsesExactAnchorsAndFormulaicGenericLabels" classname="Topoda.RLS.Tests.EditMode.ObserverSimulationTests" runstate="Runnable" seed="1365095909" result="Passed" start-time="2026-09-30 22:53:47Z" end-time="2026-09-30 22:53:47Z" duration="0.011104" asserts="0">
+                  <properties />
+                </test-case>
+                <test-case id="1020" name="TenThousandStableMembersAdvanceHeadlessly" fullname="Topoda.RLS.Tests.EditMode.ObserverSimulationTests.TenThousandStableMembersAdvanceHeadlessly" methodname="TenThousandStableMembersAdvanceHeadlessly" classname="Topoda.RLS.Tests.EditMode.ObserverSimulationTests" runstate="Runnable" seed="441505091" result="Passed" start-time="2026-09-30 22:53:47Z" end-time="2026-09-30 22:53:49Z" duration="2.246780" asserts="0">
+                  <properties />
+                  <output><![CDATA[10,000 Member headless month: 2.208 seconds
+]]></output>
+                </test-case>
+                <test-case id="1028" name="WorldPresenterRefreshDoesNotMutateDigest" fullname="Topoda.RLS.Tests.EditMode.ObserverSimulationTests.WorldPresenterRefreshDoesNotMutateDigest" methodname="WorldPresenterRefreshDoesNotMutateDigest" classname="Topoda.RLS.Tests.EditMode.ObserverSimulationTests" runstate="Runnable" seed="1313442724" result="Passed" start-time="2026-09-30 22:53:49Z" end-time="2026-09-30 22:53:49Z" duration="0.019540" asserts="0">
+                  <properties />
+                </test-case>
+              </test-suite>
+              <test-suite type="TestFixture" id="1031" name="ObserverToolkitRuntimeTests" fullname="Topoda.RLS.Tests.EditMode.ObserverToolkitRuntimeTests" classname="Topoda.RLS.Tests.EditMode.ObserverToolkitRuntimeTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-09-30 22:53:59Z" end-time="2026-09-30 22:54:01Z" duration="1.430755" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+                <properties />
+                <test-case id="1033" name="SceneEntersObserverWithSingleToolkitAndStablePausedState" fullname="Topoda.RLS.Tests.EditMode.ObserverToolkitRuntimeTests.SceneEntersObserverWithSingleToolkitAndStablePausedState" methodname="SceneEntersObserverWithSingleToolkitAndStablePausedState" classname="Topoda.RLS.Tests.EditMode.ObserverToolkitRuntimeTests" runstate="Runnable" seed="215380475" result="Passed" start-time="2026-09-30 22:53:49Z" end-time="2026-09-30 22:54:01Z" duration="11.472208" asserts="0">
+                  <properties>
+                    <property name="_JOINTYPE" value="UnityCombinatorial" />
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <output><![CDATA[RLS_OBSERVER_READY mode=WatchPreSimulation elapsedSeconds=0.293 digest=14ca16afdbbde7ce4d5438791b5fe1ddb450620cddb0d8f0a5d466e5a6bed051
+]]></output>
+                </test-case>
+                <test-case id="1032" name="ToolkitResourcesAreIncluded" fullname="Topoda.RLS.Tests.EditMode.ObserverToolkitRuntimeTests.ToolkitResourcesAreIncluded" methodname="ToolkitResourcesAreIncluded" classname="Topoda.RLS.Tests.EditMode.ObserverToolkitRuntimeTests" runstate="Runnable" seed="1392716775" result="Passed" start-time="2026-09-30 22:54:01Z" end-time="2026-09-30 22:54:01Z" duration="0.005190" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+              </test-suite>
+            </test-suite>
+            <test-suite type="TestFixture" id="1001" name="ObserverPresentationTests" fullname="Topoda.RLS.Tests.ObserverPresentationTests" classname="Topoda.RLS.Tests.ObserverPresentationTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-09-30 22:54:01Z" end-time="2026-09-30 22:54:01Z" duration="0.023402" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1003" name="LightingChangesSmoothlyAcrossFiveMinuteTicks" fullname="Topoda.RLS.Tests.ObserverPresentationTests.LightingChangesSmoothlyAcrossFiveMinuteTicks" methodname="LightingChangesSmoothlyAcrossFiveMinuteTicks" classname="Topoda.RLS.Tests.ObserverPresentationTests" runstate="Runnable" seed="559630802" result="Passed" start-time="2026-09-30 22:54:01Z" end-time="2026-09-30 22:54:01Z" duration="0.018606" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1002" name="LightingHasReadableDayNightEndpoints" fullname="Topoda.RLS.Tests.ObserverPresentationTests.LightingHasReadableDayNightEndpoints" methodname="LightingHasReadableDayNightEndpoints" classname="Topoda.RLS.Tests.ObserverPresentationTests" runstate="Runnable" seed="1437750579" result="Passed" start-time="2026-09-30 22:54:01Z" end-time="2026-09-30 22:54:01Z" duration="0.001897" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[Saving results to: C:\dev\record-label-simulator-web\Evidence\CU-07-editmode-verified.xml
+]]></output>
+              </test-case>
+            </test-suite>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

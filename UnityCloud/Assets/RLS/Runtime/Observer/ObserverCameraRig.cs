@@ -239,7 +239,7 @@ namespace Topoda.RLS.Observer
             Vector3 offset = rotation * new Vector3(0f, 0f, -distance);
             observerCamera.transform.position = focusPoint + offset;
             observerCamera.transform.rotation = rotation;
-            if (memberFollowActive && Physics.SphereCast(focusPoint, 0.3f, offset.normalized, out RaycastHit obstruction, offset.magnitude, Physics.AllLayers, QueryTriggerInteraction.Ignore))
+            if (memberFollowActive && Physics.SphereCast(focusPoint, 0.3f, offset.normalized, out RaycastHit obstruction, offset.magnitude, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
             {
                 // Keep the viewing path on the member's side of an intervening
                 // wall instead of leaving the camera behind the building.

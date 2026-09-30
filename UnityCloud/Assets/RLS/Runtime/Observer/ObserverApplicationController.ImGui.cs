@@ -117,9 +117,9 @@ namespace Topoda.RLS.Observer
             x += 70f;
             if (Button(new Rect(x, 18f, 62f, 40f), "×1", buttonStyle)) SetSpeed(1);
             x += 66f;
-            if (Button(new Rect(x, 18f, 62f, 40f), "×4", buttonStyle)) SetSpeed(4);
+            if (Button(new Rect(x, 18f, 62f, 40f), "×2", buttonStyle)) SetSpeed(2);
             x += 66f;
-            if (Button(new Rect(x, 18f, 62f, 40f), "×16", buttonStyle)) SetSpeed(16);
+            if (Button(new Rect(x, 18f, 62f, 40f), "×4", buttonStyle)) SetSpeed(4);
             x += 66f;
             if (Button(new Rect(x, 18f, 76f, 40f), "Menu", buttonStyle)) ReturnToMenu();
         }

@@ -16,13 +16,13 @@ namespace Topoda.RLS.Observer
         private const int MaxPuffs = 48;
         private const int LatitudeSegments = 6;
         private const int LongitudeSegments = 12;
-        private const float MinBoundaryRadius = 90f;
-        private const float MaxBoundaryRadius = 110f;
+        private const float MinBoundaryRadius = 66f;
+        private const float MaxBoundaryRadius = 84f;
         private static readonly int ColorPropertyId = Shader.PropertyToID("_Color");
 
         [SerializeField, Range(24, MaxPuffs)] private int puffCount = MaxPuffs;
-        [SerializeField, Range(MinBoundaryRadius, MaxBoundaryRadius)] private float innerRadius = 94f;
-        [SerializeField, Range(MinBoundaryRadius, MaxBoundaryRadius)] private float outerRadius = 108f;
+        [SerializeField, Range(MinBoundaryRadius, MaxBoundaryRadius)] private float innerRadius = 72f;
+        [SerializeField, Range(MinBoundaryRadius, MaxBoundaryRadius)] private float outerRadius = 82f;
         [SerializeField, Range(20f, 40f)] private float altitude = 29f;
 
         private Matrix4x4[] puffMatrices;

@@ -26,10 +26,15 @@ namespace Topoda.RLS.Observer
             public string selectedMember;
             public string followingMember;
             public bool followingOccluded;
+            public bool diagnosticsEnabled, diagnosticsVisible, statisticsVisible, skipInProgress;
+            public float skipProgress, minimumMemberSpacing;
+            public int memberColliders, unresolvedMemberOverlaps, recoveryAttempts, recoveryFailures;
+            public string expectedSkipDigest;
             public float cameraDistance;
             public float zoomTarget;
             public Vector3 cameraPosition;
             public ControlPoint[] controls;
+            public ControlPoint[] toggles;
             public MemberPoint[] memberPoints;
             public string[] hudText;
         }
@@ -44,11 +49,24 @@ namespace Topoda.RLS.Observer
             public float x, y;
         }
         private bool snapshotRoundTrip;
+        private string expectedSkipDigest;
         private ObserverApplicationController Host => GetComponent<ObserverApplicationController>();
 #if UNITY_WEBGL && !UNITY_EDITOR
         [DllImport("__Internal")] private static extern void RlsObserverReceipt(string json);
 #endif
         public void Watch(string unused) { Host.BeginObserverSession(ObserverMode.WatchPreSimulation); }
+        public void PrepareDaySkip(string unused) { PrepareSkip(288); }
+        public void PrepareWeekSkip(string unused) { PrepareSkip(2016); }
+        private void PrepareSkip(int steps)
+        {
+            var expected = new DeterministicSimulation(ScenarioDefinition.GenericObserverSeed(), SimulationTuning.ObserverPreview());
+            var detached = JsonUtility.FromJson<WorldSnapshot>(JsonUtility.ToJson(Host.Simulation.World));
+            expected.ReplaceWorld(detached);
+            expected.World.Clock.Paused = true;
+            expected.AdvanceSteps(steps);
+            expectedSkipDigest = expected.World.Digest;
+            Summary("");
+        }
         public void Handoff(string unused) { Host.BeginObserverSession(ObserverMode.OpenHandoff); }
         public void September(string unused)
         {
@@ -84,6 +102,12 @@ namespace Topoda.RLS.Observer
                 receipt.paused = world.Clock.Paused;
             }
             receipt.selectedMember = Host.SelectedMemberId;
+            receipt.diagnosticsEnabled = Host.DeveloperDiagnosticsEnabled;
+            receipt.diagnosticsVisible = Host.DeveloperDiagnosticsVisible;
+            receipt.statisticsVisible = Host.PlayerStatisticsVisible;
+            receipt.skipInProgress = Host.SkipInProgress;
+            receipt.skipProgress = Host.SkipProgress;
+            receipt.expectedSkipDigest = expectedSkipDigest;
             receipt.followingMember = Host.FollowingMemberId;
             var rig = FindFirstObjectByType<ObserverCameraRig>();
             if (rig != null && rig.ObserverCamera != null)
@@ -92,6 +116,13 @@ namespace Topoda.RLS.Observer
                 receipt.zoomTarget = rig.ZoomTarget;
                 receipt.cameraPosition = rig.ObserverCamera.transform.position;
                 var proxies = FindFirstObjectByType<BloomvilleMemberProxies>();
+                if (proxies != null) {
+                    receipt.memberColliders = proxies.ActiveMemberColliderCount;
+                    receipt.minimumMemberSpacing = proxies.MinimumObservedMemberSpacing;
+                    receipt.unresolvedMemberOverlaps = proxies.UnresolvedOverlapCount;
+                    receipt.recoveryAttempts = proxies.RecoveryAttemptCount;
+                    receipt.recoveryFailures = proxies.RecoveryFailureCount;
+                }
                 var points = new List<MemberPoint>();
                 if (proxies != null && world != null)
                 {
@@ -102,7 +133,7 @@ namespace Topoda.RLS.Observer
                         if (point.z > 0f) points.Add(new MemberPoint { id = member.Id, x = point.x, y = Screen.height - point.y });
                     }
                     if (!string.IsNullOrEmpty(receipt.followingMember) && proxies.TryGetMemberPosition(receipt.followingMember, out Vector3 followed))
-                        receipt.followingOccluded = Physics.Linecast(rig.ObserverCamera.transform.position, followed + Vector3.up * 0.82f, Physics.AllLayers, QueryTriggerInteraction.Ignore);
+                        receipt.followingOccluded = Physics.Linecast(rig.ObserverCamera.transform.position, followed + Vector3.up * 0.82f, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore);
                 }
                 receipt.memberPoints = points.ToArray();
             }
@@ -115,6 +146,9 @@ namespace Topoda.RLS.Observer
                     .Where(button => button.enabledInHierarchy && !string.IsNullOrEmpty(button.text) && button.worldBound.width > 0f && button.worldBound.height > 0f)
                     .Select(button => new ControlPoint { text = button.text, x = button.worldBound.center.x * scale, y = button.worldBound.center.y * scale, width = button.worldBound.width * scale, height = button.worldBound.height * scale }).ToArray();
                 receipt.hudText = root.Query<Label>().ToList().Select(label => label.text).Where(text => !string.IsNullOrEmpty(text)).Take(120).ToArray();
+                receipt.toggles = root.Query<Toggle>().ToList()
+                    .Where(toggle => toggle.enabledInHierarchy && toggle.worldBound.width > 0 && toggle.worldBound.height > 0)
+                    .Select(toggle => new ControlPoint { text = toggle.label, x = toggle.worldBound.x * scale + 12, y = toggle.worldBound.center.y * scale, width = toggle.worldBound.width * scale, height = toggle.worldBound.height * scale }).ToArray();
             }
             string json = JsonUtility.ToJson(receipt);
             Debug.Log("RLS_BROWSER_READBACK " + json);

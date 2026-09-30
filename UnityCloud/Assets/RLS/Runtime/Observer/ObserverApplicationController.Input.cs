@@ -11,12 +11,29 @@ namespace Topoda.RLS.Observer
             Keyboard keyboard = Keyboard.current;
             if (keyboard != null)
             {
-                if (keyboard.spaceKey.wasPressedThisFrame) TogglePause();
-                if (keyboard.digit1Key.wasPressedThisFrame) SetSpeed(1);
-                if (keyboard.digit2Key.wasPressedThisFrame) SetSpeed(4);
-                if (keyboard.digit3Key.wasPressedThisFrame) SetSpeed(16);
-                if (keyboard.nKey.wasPressedThisFrame) { SafeAutosave("before single step"); simulation.SingleStep(); RefreshWorldPresenter(true); }
-                if (keyboard.escapeKey.wasPressedThisFrame) ReturnToMenu();
+                bool unmodifiedTab = !keyboard.leftShiftKey.isPressed && !keyboard.rightShiftKey.isPressed &&
+                                     !keyboard.leftCtrlKey.isPressed && !keyboard.rightCtrlKey.isPressed &&
+                                     !keyboard.leftAltKey.isPressed && !keyboard.rightAltKey.isPressed;
+                if (keyboard.tabKey.wasPressedThisFrame && unmodifiedTab && developerDiagnosticsEnabled)
+                {
+                    developerDiagnosticsOpen = !developerDiagnosticsOpen;
+                    RebuildToolkit();
+                }
+
+                if (!skipInProgress)
+                {
+                    if (keyboard.spaceKey.wasPressedThisFrame) TogglePause();
+                    if (keyboard.digit1Key.wasPressedThisFrame) SetSpeed(1);
+                    if (keyboard.digit2Key.wasPressedThisFrame) SetSpeed(2);
+                    if (keyboard.digit3Key.wasPressedThisFrame) SetSpeed(4);
+                    if (developerDiagnosticsEnabled && developerDiagnosticsOpen && keyboard.nKey.wasPressedThisFrame && simulation.World.Clock.Paused)
+                    {
+                        SafeAutosave("before developer single step");
+                        simulation.SingleStep();
+                        RefreshWorldPresenter(true);
+                    }
+                    if (keyboard.escapeKey.wasPressedThisFrame) ReturnToMenu();
+                }
                 if (keyboard.homeKey.wasPressedThisFrame && cameraRig != null)
                 {
                     StopMemberFollowing();
@@ -127,6 +144,7 @@ namespace Topoda.RLS.Observer
             BloomvilleMemberProxies memberProxies = FindMemberProxies();
             if (memberProxies != null && memberProxies.TryPickMember(ray, out string memberId) && FindMemberRecord(memberId) != null)
             {
+                statsPanelOpen = false;
                 SelectMemberForInspection(memberId);
                 return;
             }
@@ -134,6 +152,7 @@ namespace Topoda.RLS.Observer
             if (worldPresenter.TryPick(ray, out string labelId))
             {
                 StopMemberFollowing();
+                statsPanelOpen = false;
                 selectedMemberId = null;
                 selectedLabelId = labelId;
                 worldPresenter.SetSelectedLabel(selectedLabelId);
