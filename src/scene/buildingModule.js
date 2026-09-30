@@ -90,6 +90,99 @@ export function createDistrictBuilding(spec) {
   return { group, setActive };
 }
 
+/** Civic City Hall — larger than a lot block; base mass plus distinct roof/dome. */
+export function createCityHall() {
+  const width = 40;
+  const depth = 28;
+  const floorHeight = 4.2;
+  const floors = 2;
+  const bodyHeight = floorHeight * floors;
+  const group = new THREE.Group();
+
+  const wallMat = new THREE.MeshStandardMaterial({
+    color: Palette.structureWallLilac,
+    roughness: 0.78,
+    metalness: 0.04,
+  });
+  const trimMat = new THREE.MeshStandardMaterial({
+    color: Palette.stone,
+    roughness: 0.72,
+    metalness: 0.05,
+  });
+  const accentMat = new THREE.MeshStandardMaterial({
+    color: Palette.annglora,
+    roughness: 0.65,
+    metalness: 0.08,
+  });
+  const domeMat = new THREE.MeshStandardMaterial({
+    color: Palette.crownia,
+    roughness: 0.42,
+    metalness: 0.22,
+  });
+
+  const plinth = new THREE.Mesh(
+    new THREE.BoxGeometry(width + 2.4, 1.2, depth + 2.4),
+    trimMat,
+  );
+  plinth.position.y = 0.6;
+  plinth.castShadow = true;
+  plinth.receiveShadow = true;
+  group.add(plinth);
+
+  const body = new THREE.Mesh(new THREE.BoxGeometry(width, bodyHeight, depth), wallMat);
+  body.position.y = 1.2 + bodyHeight / 2;
+  body.castShadow = true;
+  body.receiveShadow = true;
+  group.add(body);
+
+  const portico = new THREE.Mesh(new THREE.BoxGeometry(14, floorHeight * 0.85, 3.2), accentMat);
+  portico.position.set(0, 1.2 + floorHeight * 0.42, depth / 2 + 1.4);
+  portico.castShadow = true;
+  portico.receiveShadow = true;
+  group.add(portico);
+
+  const columns = 4;
+  for (let i = 0; i < columns; i += 1) {
+    const col = new THREE.Mesh(new THREE.CylinderGeometry(0.55, 0.65, floorHeight * 0.75, 8), trimMat);
+    const x = -4.5 + i * 3;
+    col.position.set(x, 1.2 + floorHeight * 0.38, depth / 2 + 2.6);
+    col.castShadow = true;
+    group.add(col);
+  }
+
+  const roofSlab = new THREE.Mesh(
+    new THREE.BoxGeometry(width + 1.2, 1.0, depth + 1.2),
+    trimMat,
+  );
+  roofSlab.position.y = 1.2 + bodyHeight + 0.5;
+  roofSlab.castShadow = true;
+  roofSlab.receiveShadow = true;
+  group.add(roofSlab);
+
+  const drum = new THREE.Mesh(new THREE.CylinderGeometry(5.5, 5.5, 2.8, 16), accentMat);
+  drum.position.y = 1.2 + bodyHeight + 1.0 + 1.4;
+  drum.castShadow = true;
+  group.add(drum);
+
+  const dome = new THREE.Mesh(new THREE.SphereGeometry(6.2, 18, 12, 0, Math.PI * 2, 0, Math.PI / 2), domeMat);
+  dome.position.y = 1.2 + bodyHeight + 2.8 + 2.4;
+  dome.castShadow = true;
+  group.add(dome);
+
+  const spire = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.55, 2.2, 8), trimMat);
+  spire.position.y = 1.2 + bodyHeight + 2.8 + 6.2;
+  spire.castShadow = true;
+  group.add(spire);
+
+  function setActive(active) {
+    wallMat.emissive.setHex(active ? Palette.labelCoral : 0x000000);
+    wallMat.emissiveIntensity = active ? 0.12 : 0;
+  }
+  setActive(false);
+
+  return { group, setActive };
+}
+
 function buildRoof(kind, width, depth, rise, material) {
   const roofGroup = new THREE.Group();
 

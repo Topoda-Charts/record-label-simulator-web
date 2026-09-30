@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { Palette } from "../config/palette.js";
-import { createDistrictBuilding } from "./buildingModule.js";
+import { createCityHall, createDistrictBuilding } from "./buildingModule.js";
+import { createMemberMarker } from "./memberMarker.js";
 
 /** 1 unit = 1 m · 24 m lots · 12 m street. */
 const LOT_M = 24;
@@ -94,24 +95,17 @@ export function createBloomvilleScene(canvas) {
   for (const slot of southLayout) {
     buildings.push(placeBuilding(scene, slot, slot.x, southZ, Math.PI));
   }
-  buildings.push(
-    placeBuilding(
-      scene,
-      {
-        x: 0,
-        floors: 3,
-        roofKind: "gable",
-        roofRise: 3.0,
-        w: 28,
-        d: 22,
-        wall: Palette.stone,
-        roof: Palette.structureRoof,
-      },
-      0,
-      northZ - 11,
-      0,
-    ),
-  );
+
+  const cityHallZ = -(STREET_M / 2 + SIDEWALK_M + 16 + 14);
+  const cityHall = createCityHall();
+  cityHall.group.position.set(0, 0, cityHallZ);
+  scene.add(cityHall.group);
+
+  const memberZ = -(STREET_M / 2 + 8.5);
+  const member = createMemberMarker();
+  member.group.position.set(2.5, 0, memberZ);
+  member.group.rotation.y = Math.PI * 0.08;
+  scene.add(member.group);
 
   const trees = addSoftTrees(scene, lotCentersX, northZ, southZ);
   let activeIndex = 0;
