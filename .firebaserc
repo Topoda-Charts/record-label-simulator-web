@@ -1,5 +1,1 @@
-{
-  "projects": {
-    "default": "record-label-simulator"
-  }
-}
+{ "projects": { "default": "record-label-simulator" } }

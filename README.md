@@ -1,22 +1,29 @@
-# Record Label Simulator — Web on Firebase
+# Record Label Simulator — Unity cloud observer
 
-Lightweight **Web on Firebase** host: Three.js view of Central Bloomville plus Remote Config tuning. Separate from the Windows HDRP Unity game.
+This is Unity build 2: a browser-capable C# observer, compiled by Unity CLI and delivered by Firebase Hosting. The separate Windows HDRP project remains Local HD.
 
-- **Live (after deploy):** https://record-label-simulator.web.app
-- **Tune:** https://record-label-simulator.web.app/tune/
+The first port reuses the existing deterministic simulation, eight-label observer fixture, Bloomville geometry, visible Member movement, camera, UI Toolkit inspector, event history and snapshots. It uses Unity's WebGL-compatible built-in renderer. The existing August 31 handoff remains available and observation can continue through September with the same simulation rules.
 
-See `AGENTS.md` for agent operating notes.
+## Run locally
 
-## Verification note (2026-09-30)
+Project: `UnityCloud`, Unity `6000.5.5f1`. Unity CLI is installed at `C:\Users\jlram\AppData\Local\Unity\bin\unity.exe`.
 
-- `npm run build` passed; both hosted pages (`/` and `/tune/`) returned HTTP 200.
-- The configured `publishRemoteConfig` endpoint returned HTTP 404, so saving from `/tune/` is not verified or live.
-- Firebase Functions deployment and the project's Blaze status were not verified: the Firebase CLI was unavailable, and local CLI installation failed with npm `ECOMPROMISED`.
-- Code review found that the function currently has no authentication check; restrict publishing before deploying it.
+```powershell
+unity run ./UnityCloud -- -executeMethod Topoda.RLS.Editor.CloudObserverBuild.GenerateScene
+unity test ./UnityCloud --mode EditMode --output ./Evidence/CU-03-editmode.xml
+unity build ./UnityCloud --target WebGL --execute-method Topoda.RLS.Editor.CloudObserverBuild.BuildWebGL --output-path ./UnityCloud/Builds/WebGL
+node ./Evidence/serve-unity.cjs
+```
 
-## Art provenance (this milestone)
+The bounded preview server serves the Unity player at `http://localhost:8080` when built and build status at `/status`. It expires after 60 minutes. POST `/__stop` closes it early.
 
-- **3D geometry:** procedural district modules in Three.js (`src/scene/buildingModule.js`, `src/scene/bloomvilleScene.js`) — no external mesh packs.
-- **Colors:** ObserverPalette / Gaia observer brief (Annglora `#CC99FF`, Byteria `#3333FF`, Crownia `#FFD700`, app surfaces `#FAF7F2`) — aligned with Drive canon; not a new canon lock for lighting/fog.
-- **Raster textures:** none shipped in v0.1; no Leonardo or generated image batch in this pass.
-- **Drive reference (concept, not copied into repo):** [TTH — Bloomville Cover Concept — Visual Identity Brief](https://docs.google.com/document/d/1qTcvwTq_NEn9IkVVePT81Fi082ucDMi2FT3fKVcfOyo/edit) (JL asset).
+## Authority and verification
+
+- [Current build execution: TCS-182](https://linear.app/topoda-charts-studios/issue/TCS-182/stand-up-the-second-unity-project-for-the-cloud-universal-player)
+- [Shared behavior translation: TCS-195](https://linear.app/topoda-charts-studios/issue/TCS-195/translate-the-label-loop-and-member-rules-into-the-cloud-unity-project)
+- [Observer specification](https://docs.google.com/document/d/1G7nIoYHzhVgFwX1vDElF-Si_VPDslg51FwiPxMGiwyg/edit)
+- [Current phase workflow](https://app.notion.com/p/3a8caa6d78ed81e99eb3c8e3aa48b8f3?pvs=204)
+
+Each Member is one person. City Hall is a civic landmark. Production remains Sheet Music → Demo Recording → Master → released Track. This observer has no player label-management route. Economy values remain provisional, versioned observer tuning. Firebase does not calculate the simulation or own snapshots.
+
+Implementation and build/runtime verification status are recorded in `Evidence/checkpoints.json`. Source presence alone is not a verified player build or JL acceptance.
