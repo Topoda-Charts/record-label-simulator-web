@@ -17,7 +17,11 @@ namespace Topoda.RLS.Observer
                 if (keyboard.digit3Key.wasPressedThisFrame) SetSpeed(16);
                 if (keyboard.nKey.wasPressedThisFrame) { SafeAutosave("before single step"); simulation.SingleStep(); RefreshWorldPresenter(true); }
                 if (keyboard.escapeKey.wasPressedThisFrame) ReturnToMenu();
-                if (keyboard.homeKey.wasPressedThisFrame && cameraRig != null) cameraRig.ResetOverview(reducedMotion);
+                if (keyboard.homeKey.wasPressedThisFrame && cameraRig != null)
+                {
+                    StopMemberFollowing();
+                    cameraRig.ResetOverview(reducedMotion);
+                }
             }
 
             if (cameraRig == null || keyboard == null)
@@ -25,17 +29,19 @@ namespace Topoda.RLS.Observer
                 return;
             }
 
-            float pan = 1f * Time.unscaledDeltaTime;
+            float pan = 1f;
             Vector2 panAxis = Vector2.zero;
             if (keyboard.leftArrowKey.isPressed || keyboard.aKey.isPressed) panAxis.x -= pan;
             if (keyboard.rightArrowKey.isPressed || keyboard.dKey.isPressed) panAxis.x += pan;
             if (keyboard.upArrowKey.isPressed || keyboard.wKey.isPressed) panAxis.y += pan;
             if (keyboard.downArrowKey.isPressed || keyboard.sKey.isPressed) panAxis.y -= pan;
+            if (panAxis.sqrMagnitude > 0.0001f) StopMemberFollowing();
             cameraRig.HandleKeyboardPan(panAxis, Time.unscaledDeltaTime);
 
             float orbitDirection = 0f;
             if (keyboard.qKey.isPressed) orbitDirection -= 1f;
             if (keyboard.eKey.isPressed) orbitDirection += 1f;
+            if (Mathf.Abs(orbitDirection) > 0.001f) StopMemberFollowing();
             cameraRig.HandleOrbitKeys(orbitDirection, Time.unscaledDeltaTime);
         }
 
@@ -58,15 +64,21 @@ namespace Topoda.RLS.Observer
             bool pointerOverHud = IsPointerOverObserverHud(guiPointer);
             if (!pointerOverHud && mouse.leftButton.wasPressedThisFrame)
                 toolkitRoot?.panel?.focusController?.focusedElement?.Blur();
-            if (!pointerOverHud) cameraRig.HandleZoom(mouse.scroll.ReadValue().y / 120f);
+            // Input System 1.19 defaults to uniform wheel units; it has already
+            // converted a Windows notch from 120 to 1.
+            float zoomDelta = mouse.scroll.ReadValue().y;
+            if (!pointerOverHud && Mathf.Abs(zoomDelta) > 0.001f) StopMemberFollowing();
+            if (!pointerOverHud) cameraRig.HandleZoom(zoomDelta, pointer);
             bool orbitHeld = Keyboard.current != null && (Keyboard.current.leftAltKey.isPressed || Keyboard.current.rightAltKey.isPressed);
 
             if (mouse.leftButton.wasPressedThisFrame && orbitHeld && !pointerOverHud)
             {
+                StopMemberFollowing();
                 cameraRig.BeginOrbitDrag(pointer);
             }
             else if ((mouse.rightButton.wasPressedThisFrame || mouse.middleButton.wasPressedThisFrame) && !pointerOverHud)
             {
+                StopMemberFollowing();
                 cameraRig.BeginPanDrag(pointer);
             }
 
@@ -112,12 +124,23 @@ namespace Topoda.RLS.Observer
             }
 
             Ray ray = cameraRig.ObserverCamera.ScreenPointToRay(pointer);
+            BloomvilleMemberProxies memberProxies = FindMemberProxies();
+            if (memberProxies != null && memberProxies.TryPickMember(ray, out string memberId) && FindMemberRecord(memberId) != null)
+            {
+                SelectMemberForInspection(memberId);
+                return;
+            }
+
             if (worldPresenter.TryPick(ray, out string labelId))
             {
+                StopMemberFollowing();
+                selectedMemberId = null;
                 selectedLabelId = labelId;
                 worldPresenter.SetSelectedLabel(selectedLabelId);
                 worldPresenter.RefreshFromSnapshot(simulation.World);
                 cameraRig.Focus(worldPresenter.GetFocusPoint(selectedLabelId), reducedMotion);
+                inspectorOpen = true;
+                RebuildToolkit();
             }
         }
 

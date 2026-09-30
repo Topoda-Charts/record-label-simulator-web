@@ -12,7 +12,8 @@ namespace Topoda.RLS.Observer
         private PanelSettings toolkitPanel;
         private ApplicationState toolkitState = (ApplicationState)(-1);
         private bool toolkitPicker;
-        private bool inspectorOpen = true;
+        private bool inspectorOpen;
+        private bool eventHistoryOpen;
         private Label clockLabel, transportLabel, saveLabel, errorLabel, inspectorTitle, inspectorSubtitle;
         private Button pauseButton;
         private ProgressBar loadProgress;
@@ -75,7 +76,7 @@ namespace Topoda.RLS.Observer
             if (toolkitRoot == null) return;
             toolkitPanel.scale = textScale;
             toolkitRoot.EnableInClassList("high-contrast", highContrast);
-            bool compactViewport = Screen.width < 960 || Screen.height < 640;
+            bool compactViewport = Screen.width < 1180 || Screen.height < 720;
             bool narrowViewport = Screen.width < 640;
             if (toolkitCompactViewport != compactViewport)
             {
@@ -110,6 +111,8 @@ namespace Topoda.RLS.Observer
             transportLabel.text = simulation.World.Clock.Paused ? "PAUSED" : "OBSERVING  ×" + simulation.World.Clock.Speed;
             pauseButton.text = simulation.World.Clock.Paused ? "Play" : "Pause";
             saveLabel.text = statusMessage;
+            RefreshProductionTray();
+            RefreshMemberInspector();
             if (renderedStep == simulation.World.Clock.StepIndex && renderedLabel == selectedLabelId && renderedFilter == eventFilter) return;
             renderedStep = simulation.World.Clock.StepIndex;
             renderedLabel = selectedLabelId;
@@ -120,6 +123,7 @@ namespace Topoda.RLS.Observer
         private void RebuildToolkit()
         {
             toolkitRoot.Clear();
+            toolkitRoot.EnableInClassList("production-open", productionTrayOpen);
             metricLabels.Clear();
             renderedStep = -1;
             renderedLabel = null;
@@ -180,55 +184,82 @@ namespace Topoda.RLS.Observer
 
         private void BuildObserverToolkit()
         {
-            var bar = Box(toolkitRoot, "topbar row");
-            var identity = Box(bar, "identity");
-            Text(identity, "CENTRAL BLOOMVILLE", "brand");
-            Text(identity, mode == ObserverMode.OpenHandoff ? "Aug 31 handoff" : "Watch the world grow", "muted");
-            var clock = Box(bar, "clock");
+            var bar = Box(toolkitRoot, "topbar");
+            var location = Box(bar, "topbar-location");
+            Text(location, "CENTRAL BLOOMVILLE", "brand");
+            Text(location, mode == ObserverMode.OpenHandoff ? "Aug 31 handoff" : "Watch the world grow", "muted");
+
+            var center = Box(bar, "topbar-center");
+            var clock = Box(center, "clock row");
             clockLabel = Text(clock, "", "clock-text");
             transportLabel = Text(clock, "", "eyebrow");
-            pauseButton = ActionButton(bar, "Play", TogglePause, "primary");
-            ActionButton(bar, "Step", () => { SafeAutosave("before single step"); simulation.SingleStep(); RefreshWorldPresenter(true); });
-            foreach (int speed in new[] { 1, 4, 16 }) { int value = speed; ActionButton(bar, "×" + speed, () => SetSpeed(value)); }
-            ActionButton(bar, "Inspect", () => { inspectorOpen = !inspectorOpen; RebuildToolkit(); });
-            ActionButton(bar, "Menu", ReturnToMenu);
+            pauseButton = ActionButton(center, "Play", TogglePause, "primary");
+            ActionButton(center, "Step", () => { SafeAutosave("before single step"); simulation.SingleStep(); RefreshWorldPresenter(true); });
+            foreach (int speed in new[] { 1, 4, 16 }) { int value = speed; ActionButton(center, "×" + speed, () => SetSpeed(value)); }
+            ActionButton(center, "Skip 1 day", () => Skip(TimeSpan.FromDays(1)));
+            ActionButton(center, "Skip 1 week", () => Skip(TimeSpan.FromDays(7)));
+            ActionButton(center, "Production", () => { productionTrayOpen = !productionTrayOpen; RebuildToolkit(); }, productionTrayOpen ? "primary" : "");
+
+            var right = Box(bar, "topbar-right");
+            saveLabel = Text(right, statusMessage, "topbar-save-status");
+            ActionButton(right, "Snapshots", OpenSnapshotToolkit);
+            ActionButton(right, "Settings", () => state = ApplicationState.Settings);
+            ActionButton(right, "Inspect", () => { inspectorOpen = !inspectorOpen; RebuildToolkit(); }, inspectorOpen ? "primary" : "");
+            ActionButton(right, "Menu", ReturnToMenu);
+
+            if (productionTrayOpen) BuildProductionTray(toolkitRoot);
+
             if (inspectorOpen)
             {
-                var panel = Box(toolkitRoot, "inspector light-panel");
-                inspectorTitle = Text(panel, "Record Label", "section-title");
-                inspectorSubtitle = Text(panel, "", "muted");
-                var scroll = new ScrollView(ScrollViewMode.Vertical); panel.Add(scroll);
-                foreach (string key in new[] { "Cash", "Reputation", "Catalog value", "Chart score", "Audience", "Structure slots" })
+                if (!string.IsNullOrEmpty(selectedMemberId) && BuildMemberInspector(toolkitRoot))
                 {
-                    var metric = Box(scroll, "metric row"); Text(metric, key, "metric-name"); metricLabels[key] = Text(metric, "—", "metric-value");
+                    inspectorTitle = null;
+                    inspectorSubtitle = null;
+                    workList = null;
                 }
-                var preferences = new Foldout { text = "Strategy preferences", value = false }; scroll.Add(preferences);
-                foreach (string key in new[] { "Release cadence", "Quality target", "Promotion spend", "Cash reserve", "Audience growth", "Trend response" })
-                { var metric = Box(preferences, "metric row"); Text(metric, key, "metric-name"); metricLabels[key] = Text(metric, "—", "metric-value"); }
-                Text(scroll, "Recent work", "section-title");
-                workList = new ScrollView(ScrollViewMode.Vertical); workList.AddToClassList("works"); scroll.Add(workList);
-                var saves = new Foldout { text = "Snapshots & time", value = false }; scroll.Add(saves);
-                var name = new TextField("Name") { value = snapshotName };
-                name.RegisterValueChangedCallback(e => snapshotName = e.newValue); saves.Add(name);
-                ActionButton(saves, "Create named snapshot", SaveNamedSnapshot, "primary");
-                var skip = Box(saves, "row");
-                ActionButton(skip, "Skip 1 day", () => Skip(TimeSpan.FromDays(1)));
-                ActionButton(skip, "Skip 1 week", () => Skip(TimeSpan.FromDays(7)));
-                var tools = Box(saves, "row"); ActionButton(tools, "Load", OpenSnapshotToolkit);
-                ActionButton(tools, "Reset", ResetWorld);
+                else
+                {
+                    inspectorTitle = null;
+                    inspectorSubtitle = null;
+                    var panel = Box(toolkitRoot, "inspector light-panel");
+                    inspectorTitle = Text(panel, "Record Label", "section-title");
+                    inspectorSubtitle = Text(panel, "", "muted");
+                    var scroll = new ScrollView(ScrollViewMode.Vertical); panel.Add(scroll);
+                    foreach (string key in new[] { "Cash", "Reputation", "Catalog value", "Chart score", "Audience", "Structure slots" })
+                    {
+                        var metric = Box(scroll, "metric row"); Text(metric, key, "metric-name"); metricLabels[key] = Text(metric, "—", "metric-value");
+                    }
+                    var preferences = new Foldout { text = "Strategy preferences", value = false }; scroll.Add(preferences);
+                    foreach (string key in new[] { "Release cadence", "Quality target", "Promotion spend", "Cash reserve", "Audience growth", "Trend response" })
+                    { var metric = Box(preferences, "metric row"); Text(metric, key, "metric-name"); metricLabels[key] = Text(metric, "—", "metric-value"); }
+                    Text(scroll, "Recent work", "section-title");
+                    workList = new ScrollView(ScrollViewMode.Vertical); workList.AddToClassList("works"); scroll.Add(workList);
+                    var saves = new Foldout { text = "Snapshots & recovery", value = false }; scroll.Add(saves);
+                    var name = new TextField("Name") { value = snapshotName };
+                    name.RegisterValueChangedCallback(e => snapshotName = e.newValue); saves.Add(name);
+                    ActionButton(saves, "Create named snapshot", SaveNamedSnapshot, "primary");
+                    var tools = Box(saves, "row"); ActionButton(tools, "Load snapshots", OpenSnapshotToolkit);
+                    ActionButton(tools, "Reset", ResetWorld);
+                }
             }
             else { inspectorTitle = null; inspectorSubtitle = null; workList = null; }
+
             var feed = Box(toolkitRoot, "event-feed light-panel");
             feed.EnableInClassList("wide-feed", !inspectorOpen);
-            var filters = Box(feed, "row");
-            Text(filters, "WORLD EVENTS", "feed-title");
-            foreach (string filter in new[] { "All", "Creation", "Production", "Release", "Promotion", "Chart" })
+            feed.EnableInClassList("history-open", eventHistoryOpen);
+            var header = Box(feed, "event-header row");
+            Text(header, eventHistoryOpen ? "WORLD HISTORY" : "LATEST EVENTS", "feed-title");
+            ActionButton(header, eventHistoryOpen ? "Latest" : "History", () => { eventHistoryOpen = !eventHistoryOpen; RebuildToolkit(); });
+            if (eventHistoryOpen)
             {
-                string category = filter;
-                ActionButton(filters, filter, () => { eventFilter = category; renderedFilter = null; });
+                var filters = Box(feed, "row event-filters");
+                foreach (string filter in new[] { "All", "Creation", "Production", "Release", "Promotion", "Chart" })
+                {
+                    string category = filter;
+                    ActionButton(filters, filter, () => { eventFilter = category; renderedFilter = null; });
+                }
             }
             eventList = new ScrollView(ScrollViewMode.Vertical); feed.Add(eventList);
-            saveLabel = Text(toolkitRoot, statusMessage, "save-status");
         }
 
         private void RefreshToolkitInspection()
@@ -251,7 +282,7 @@ namespace Topoda.RLS.Observer
                 foreach (var work in simulation.World.Works.Where(x => x.LabelId == label.Id).OrderByDescending(x => x.CreatedTicks).Take(4))
                 { var item = Box(workList, "work-card"); Text(item, work.Title, "work-title"); Text(item, ObserverDisplayFormat.StageLabel(work), "muted"); }
             }
-            var recent = simulation.RecentEvents(20, eventFilter);
+            var recent = simulation.RecentEvents(eventHistoryOpen ? 20 : 2, eventFilter);
             string eventsKey = eventFilter + "|" + string.Join("|", recent.Select(item => item.OccurredTicks + ":" + item.Headline));
             if (eventsKey == renderedEventsKey) return;
             renderedEventsKey = eventsKey;
@@ -277,6 +308,9 @@ namespace Topoda.RLS.Observer
             var card = Box(modal, "menu-card light-panel");
             Text(card, "Load a local snapshot", "section-title");
             Text(card, "Your current world is protected before loading.", "muted");
+            var name = new TextField("Snapshot name") { value = snapshotName };
+            name.RegisterValueChangedCallback(e => snapshotName = e.newValue); card.Add(name);
+            ActionButton(card, "Create named snapshot", SaveNamedSnapshot, "primary");
             var list = new ScrollView(ScrollViewMode.Vertical); list.AddToClassList("snapshot-list"); card.Add(list);
             if (snapshotList.Count == 0) Text(list, "No snapshots yet. Watch the world grow to create one.", "body-copy");
             foreach (var item in snapshotList)

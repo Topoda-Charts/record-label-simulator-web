@@ -13,3 +13,4 @@ Evidence/node_modules/
 .cache/
 *.csproj
 *.sln
+Evidence/*-browser-console.json

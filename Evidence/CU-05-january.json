@@ -1,0 +1,12 @@
+{
+  "state": "Observer",
+  "date": "2425-01-01T00:00:00.0000000Z",
+  "digest": "14ca16afdbbde7ce4d5438791b5fe1ddb450620cddb0d8f0a5d466e5a6bed051",
+  "members": 24,
+  "labels": 8,
+  "tracks": 0,
+  "events": 2,
+  "cash": 1000000,
+  "snapshotRoundTrip": false,
+  "visibleRenderers": 250
+}

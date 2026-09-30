@@ -4,9 +4,12 @@ namespace Topoda.RLS.Observer
 {
     public sealed class ObserverCameraRig : MonoBehaviour
     {
-        private const float MinDistance = 20f;
+        private const float MinDistance = 6f;
         private const float MaxDistance = 165f;
         private const float DefaultDistance = 118f;
+        private const float MemberFollowWorldBound = 64f;
+        private const float MemberFollowPitch = 32f;
+        private const float MemberFollowDistance = 12f;
         private static readonly Vector3 OverviewFocus = new Vector3(0f, 0f, 0f);
 
         [SerializeField] private Camera observerCamera;
@@ -14,6 +17,11 @@ namespace Topoda.RLS.Observer
         private float yaw;
         private float pitch = 52f;
         private float distance = DefaultDistance;
+        private float zoomTarget = DefaultDistance;
+        private float zoomVelocity;
+        private Vector3 zoomAnchor;
+        private Vector2 zoomPointer;
+        private bool hasZoomAnchor;
         private Vector3 focusPoint = OverviewFocus;
         private Vector3 focusTarget = OverviewFocus;
         private Vector3 focusVelocity;
@@ -23,6 +31,8 @@ namespace Topoda.RLS.Observer
         private bool reducedMotion;
 
         public Camera ObserverCamera { get { return observerCamera; } }
+        public float ViewDistance { get { return distance; } }
+        public float ZoomTarget { get { return zoomTarget; } }
 
         public void Configure(Camera camera)
         {
@@ -42,6 +52,9 @@ namespace Topoda.RLS.Observer
             yaw = 32f;
             pitch = 52f;
             distance = DefaultDistance;
+            zoomTarget = DefaultDistance;
+            zoomVelocity = 0f;
+            hasZoomAnchor = false;
             focusVelocity = Vector3.zero;
             if (instant || reducedMotion)
             {
@@ -51,6 +64,7 @@ namespace Topoda.RLS.Observer
 
         public void Focus(Vector3 worldPoint, bool instant)
         {
+            hasZoomAnchor = false;
             focusTarget = worldPoint;
             focusTarget.y = Mathf.Max(focusTarget.y, 0f);
             if (instant || reducedMotion)
@@ -61,12 +75,24 @@ namespace Topoda.RLS.Observer
             }
         }
 
+        public void FollowMember(Vector3 worldPoint)
+        {
+            focusTarget = new Vector3(
+                Mathf.Clamp(worldPoint.x, -MemberFollowWorldBound, MemberFollowWorldBound),
+                Mathf.Clamp(worldPoint.y, 0f, 4f),
+                Mathf.Clamp(worldPoint.z, -MemberFollowWorldBound, MemberFollowWorldBound));
+            zoomTarget = MemberFollowDistance;
+            hasZoomAnchor = false;
+            pitch = MemberFollowPitch;
+        }
+
         public void HandleKeyboardPan(Vector2 axis, float deltaTime)
         {
             if (axis.sqrMagnitude <= 0.0001f)
             {
                 return;
             }
+            hasZoomAnchor = false;
 
             Vector3 forward = FlatForward();
             Vector3 right = Vector3.Cross(Vector3.up, forward).normalized;
@@ -88,22 +114,33 @@ namespace Topoda.RLS.Observer
 
         public void HandleZoom(float scrollDelta)
         {
+            HandleZoom(scrollDelta, new Vector2(Screen.width * 0.5f, Screen.height * 0.5f));
+        }
+
+        public void HandleZoom(float scrollDelta, Vector2 screenPosition)
+        {
             if (Mathf.Abs(scrollDelta) <= 0.001f)
             {
                 return;
             }
 
-            distance = Mathf.Clamp(distance - scrollDelta * distance * 0.12f, MinDistance, MaxDistance);
+            zoomPointer = screenPosition;
+            hasZoomAnchor = TryGroundPoint(screenPosition, out zoomAnchor);
+            // A notch changes scale by about 10%; fractional trackpad input is
+            // preserved and accumulated bursts cannot jump across the scene.
+            zoomTarget = Mathf.Clamp(zoomTarget * Mathf.Exp(-Mathf.Clamp(scrollDelta, -3f, 3f) * 0.1f), MinDistance, MaxDistance);
         }
 
         public void BeginPanDrag(Vector2 screenPosition)
         {
+            hasZoomAnchor = false;
             draggingPan = true;
             lastPointer = screenPosition;
         }
 
         public void BeginOrbitDrag(Vector2 screenPosition)
         {
+            hasZoomAnchor = false;
             draggingOrbit = true;
             lastPointer = screenPosition;
         }
@@ -155,13 +192,36 @@ namespace Topoda.RLS.Observer
             if (reducedMotion)
             {
                 focusPoint = focusTarget;
+                distance = zoomTarget;
             }
             else
             {
                 focusPoint = Vector3.SmoothDamp(focusPoint, focusTarget, ref focusVelocity, 0.38f);
+                distance = Mathf.SmoothDamp(distance, zoomTarget, ref zoomVelocity, 0.14f, Mathf.Infinity, Time.unscaledDeltaTime);
             }
 
             ApplyTransformImmediate();
+            if (hasZoomAnchor && TryGroundPoint(zoomPointer, out Vector3 currentAnchor))
+            {
+                Vector3 correction = zoomAnchor - currentAnchor;
+                correction.y = 0f;
+                focusPoint += correction;
+                focusTarget += correction;
+                ClampFocus();
+                ApplyTransformImmediate();
+                if (Mathf.Abs(distance - zoomTarget) < 0.002f) hasZoomAnchor = false;
+            }
+        }
+
+        private bool TryGroundPoint(Vector2 screenPosition, out Vector3 point)
+        {
+            point = Vector3.zero;
+            if (observerCamera == null) return false;
+            Ray ray = observerCamera.ScreenPointToRay(screenPosition);
+            var ground = new Plane(Vector3.up, Vector3.zero);
+            if (!ground.Raycast(ray, out float enter) || enter > 1000f) return false;
+            point = ray.GetPoint(enter);
+            return true;
         }
 
         private void ApplyTransformImmediate()

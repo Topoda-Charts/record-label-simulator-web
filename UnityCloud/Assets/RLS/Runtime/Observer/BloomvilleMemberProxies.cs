@@ -131,6 +131,8 @@ namespace Topoda.RLS.Observer
         private const float LogicInterval = 0.12f;
         private const float PulseDurationSeconds = 2.4f;
         private const float RoadSpacing = 16f;
+        private const float ProxyPickRadius = 0.36f;
+        private const float ProxyPickSegmentHalfHeight = 0.54f;
         private static readonly int StandardColorId = Shader.PropertyToID("_Color");
 
         [SerializeField] private int sampleCap = BloomvilleMemberProxyPlanning.SampleCap;
@@ -243,6 +245,102 @@ namespace Topoda.RLS.Observer
             MeshFilter filter = temp.GetComponent<MeshFilter>();
             proxyMesh = filter.sharedMesh;
             Destroy(temp);
+        }
+
+        public bool TryPickMember(Ray ray, out string memberId)
+        {
+            memberId = null;
+            float nearestDistance = float.MaxValue;
+            for (int index = 0; index < proxies.Count; index++)
+            {
+                MemberProxyState proxy = proxies[index];
+                if (TryIntersectProxy(ray, proxy.Position, out float distance) && distance < nearestDistance)
+                {
+                    nearestDistance = distance;
+                    memberId = proxy.MemberId;
+                }
+            }
+
+            return !string.IsNullOrEmpty(memberId);
+        }
+
+        public bool TryGetMemberPosition(string memberId, out Vector3 position)
+        {
+            for (int index = 0; index < proxies.Count; index++)
+            {
+                MemberProxyState proxy = proxies[index];
+                if (string.Equals(proxy.MemberId, memberId, StringComparison.Ordinal))
+                {
+                    position = proxy.Position;
+                    return true;
+                }
+            }
+
+            position = Vector3.zero;
+            return false;
+        }
+
+        private static bool TryIntersectProxy(Ray ray, Vector3 center, out float nearestDistance)
+        {
+            nearestDistance = float.MaxValue;
+            Vector3 origin = ray.origin - center;
+            Vector3 direction = ray.direction;
+            float a = direction.x * direction.x + direction.z * direction.z;
+            if (a > 0.000001f)
+            {
+                float b = 2f * (origin.x * direction.x + origin.z * direction.z);
+                float c = origin.x * origin.x + origin.z * origin.z - ProxyPickRadius * ProxyPickRadius;
+                float discriminant = b * b - 4f * a * c;
+                if (discriminant >= 0f)
+                {
+                    float root = Mathf.Sqrt(discriminant);
+                    ConsiderCylinderHit(ray, origin, (-b - root) / (2f * a), ref nearestDistance);
+                    ConsiderCylinderHit(ray, origin, (-b + root) / (2f * a), ref nearestDistance);
+                }
+            }
+
+            ConsiderSphereHit(ray, center + Vector3.up * ProxyPickSegmentHalfHeight, ref nearestDistance);
+            ConsiderSphereHit(ray, center - Vector3.up * ProxyPickSegmentHalfHeight, ref nearestDistance);
+            return nearestDistance < float.MaxValue;
+        }
+
+        private static void ConsiderCylinderHit(Ray ray, Vector3 originOffset, float distance, ref float nearestDistance)
+        {
+            if (distance < 0f || distance >= nearestDistance)
+            {
+                return;
+            }
+
+            float hitY = originOffset.y + ray.direction.y * distance;
+            if (hitY >= -ProxyPickSegmentHalfHeight && hitY <= ProxyPickSegmentHalfHeight)
+            {
+                nearestDistance = distance;
+            }
+        }
+
+        private static void ConsiderSphereHit(Ray ray, Vector3 sphereCenter, ref float nearestDistance)
+        {
+            Vector3 offset = ray.origin - sphereCenter;
+            float directionLengthSquared = Vector3.Dot(ray.direction, ray.direction);
+            float halfB = Vector3.Dot(offset, ray.direction);
+            float c = Vector3.Dot(offset, offset) - ProxyPickRadius * ProxyPickRadius;
+            float discriminant = halfB * halfB - directionLengthSquared * c;
+            if (discriminant < 0f || directionLengthSquared <= 0.000001f)
+            {
+                return;
+            }
+
+            float root = Mathf.Sqrt(discriminant);
+            float distance = (-halfB - root) / directionLengthSquared;
+            if (distance < 0f)
+            {
+                distance = (-halfB + root) / directionLengthSquared;
+            }
+
+            if (distance >= 0f && distance < nearestDistance)
+            {
+                nearestDistance = distance;
+            }
         }
 
         private void EnsurePulseRoot()

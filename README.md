@@ -17,6 +17,10 @@ node ./Evidence/serve-unity.cjs
 
 The bounded preview server serves the Unity player at `http://localhost:8080` when built and build status at `/status`. It expires after 60 minutes. POST `/__stop` closes it early.
 
+Use `CloudObserverBuild.BuildWebGLIteration` during HUD iteration to select Debug native compilation and OptimizeSize IL2CPP generation. Retain `Library/Bee` between runs. A new checkpoint may be built into `UnityCloud/Builds/CU-06/WebGL` and inspected at `/preview/` while the last verified build remains at `/`.
+
+Wheel input uses Input System 1.19's uniform units, smoothly zooms toward the cursor, and is ignored over HUD panels. Right/middle drag pans; Alt + left drag orbits; Home restores the overview. Click a member to inspect and follow it. Manual camera movement cancels following. The Production control opens a tray of recorded output links; its actions inspect the simulation without directing a label.
+
 ## Authority and verification
 
 - [Current build execution: TCS-182](https://linear.app/topoda-charts-studios/issue/TCS-182/stand-up-the-second-unity-project-for-the-cloud-universal-player)

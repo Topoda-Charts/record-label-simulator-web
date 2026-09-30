@@ -102,12 +102,14 @@ namespace Topoda.RLS.Observer
 
             if (state != ApplicationState.Observer || simulation == null)
             {
+                StopMemberFollowing();
                 return;
             }
 
             HandleObserverKeyboard();
             HandleObserverCameraInput();
             HandleObserverWorldSelection();
+            UpdateMemberFollowing();
             RefreshWorldPresenter(false);
             if (showSnapshotPicker || simulation.World.Clock.Paused || reviewStage == ObserverReviewStage.MenuAndShell)
             {

@@ -44,7 +44,12 @@ namespace Topoda.RLS.Tests.EditMode
             Assert.That(controller.CurrentState, Is.EqualTo(ApplicationState.Observer));
             for (int i = 0; i < 20; i++) yield return null;
             Assert.That(document.rootVisualElement.Q(className: "topbar"), Is.Not.Null);
-            Assert.That(document.rootVisualElement.Q(className: "inspector"), Is.Not.Null);
+            Assert.That(document.rootVisualElement.Q(className: "inspector"), Is.Null,
+                "The observer begins with the world visible and contextual inspection closed.");
+            var inspect = document.rootVisualElement.Query<Button>().ToList().First(button => button.text == "Inspect");
+            Assert.That(inspect.enabledInHierarchy, Is.True);
+            // Opening/scrolling inspection is exercised through real browser
+            // mouse input; this batch test checks the initial panel structure.
             Assert.That(document.rootVisualElement.Q(className: "event-feed"), Is.Not.Null);
             Assert.That(controller.Simulation.World.Clock.Paused, Is.True);
             long step = controller.Simulation.World.Clock.StepIndex;
