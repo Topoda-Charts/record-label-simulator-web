@@ -1,15 +1,22 @@
 {
-  "checkpoint": "CU-06",
-  "state": "25/25 Unity tests pass; isolated WebGL build running; browser input verification pending",
-  "lastVerifiedCheckpoint": "CU-05",
-  "sourceCommit": "4c5659ac27454abca8348b35bce0cf899c601cd9",
-  "unityBuildSession": 59405,
+  "checkpoint": "CU-07",
+  "state": "Local CU-07 actual player verified with retained filesystem warnings; public deployment pending",
+  "lastVerifiedCheckpoint": "CU-07",
+  "sourceCommit": "24bf6cee7f0afee69ad3017a9c504adef9e9cb88",
+  "unityBuildSession": null,
   "buildTimeoutSeconds": 2400,
-  "previewProcess": 11384,
-  "previewSession": 86488,
-  "previewExpiresAtUtc": "2026-09-30T22:14:07.096Z",
+  "previewProcess": 3232,
+  "previewSession": 13247,
+  "previewExpiresAtUtc": "2026-09-30T23:46:03.5Z",
   "currentPlayer": "http://localhost:8080/",
-  "nextPlayer": "http://localhost:8080/preview/",
+  "nextPlayer": "http://localhost:8080/candidate/",
   "firebasePublished": false,
-  "agents": "All three Luna assignments completed"
+  "agents": "All task subagents completed; integrating agent alone runs Unity",
+  "guidanceCheckedAtUtc": "2026-09-30T23:05:30Z",
+  "guidance": [
+    "TCS-197",
+    "TCS-198",
+    "Drive Neighborhood Simulation Scope"
+  ],
+  "scopeLimitations": "Current neighborhood remains a three-workplace observer blockout. Housing demand, Area opening/shrink, full employment schedules and non-Creator occupations are not implemented."
 }

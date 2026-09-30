@@ -9,12 +9,16 @@ fs.mkdirSync(directory,{recursive:true});
 (async()=>{
  const browser = await chromium.launch({executablePath:'C:/Program Files/Google/Chrome/Application/chrome.exe',headless:true,args:['--enable-webgl','--enable-unsafe-swiftshader']});
  const deadline = setTimeout(()=>browser.close().catch(()=>{}),15*60*1000);
- const errors=[],messages=[],errorCounts={};
+ const errors=[],warnings=[],messages=[],errorCounts={};
  const timings={},startedAt=Date.now();
  let browserGraphics;
  const recordError=text=>{errorCounts[text]=(errorCounts[text]||0)+1;if(!errors.includes(text))errors.push(text);};
  const page = await browser.newPage({viewport:{width:1600,height:900}});
- page.on('console',msg=>{if(messages.length<2000)messages.push({type:msg.type(),text:msg.text()});if(msg.type()==='error')recordError(msg.text());});
+ page.on('console',msg=>{
+  if(messages.length<2000)messages.push({type:msg.type(),text:msg.text()});
+  if(msg.type()==='warning'||/^warning:/i.test(msg.text())){if(!warnings.includes(msg.text()))warnings.push(msg.text());}
+  else if(msg.type()==='error')recordError(msg.text());
+ });
  page.on('pageerror',err=>recordError(err.message));
  const send = async method=>page.evaluate(method=>window.rlsUnityInstance.SendMessage('RLS Observer Application',method,''),method);
  const summary = async()=>{await send('Summary');return page.evaluate(()=>window.rlsObserverReceipt);};
@@ -80,9 +84,10 @@ fs.mkdirSync(directory,{recursive:true});
     await page.mouse.click(450,350);await page.keyboard.press('Tab');await page.waitForTimeout(500);
     if(!(await summary()).diagnosticsVisible)throw new Error('Opted-in Tab did not open diagnostics');
     await capture('10-developer-diagnostics');
-    const beforeStep=await summary();await page.keyboard.press('n');await page.waitForTimeout(450);
+    await page.mouse.click(450,350);await page.waitForTimeout(300);
+    const beforeStep=await summary();await page.keyboard.press('n',{delay:120});await page.waitForTimeout(450);
     const stepped=await summary();
-    if(Date.parse(stepped.date)-Date.parse(beforeStep.date)!==300000)throw new Error('Gated developer step did not advance one fixed tick');
+    if(Date.parse(stepped.date)-Date.parse(beforeStep.date)!==300000)throw new Error('Gated developer step did not advance one fixed tick: '+JSON.stringify({before:beforeStep.date,after:stepped.date,paused:stepped.paused,enabled:stepped.diagnosticsEnabled,visible:stepped.diagnosticsVisible}));
     await page.keyboard.press('Tab');await page.waitForTimeout(400);
     if((await summary()).diagnosticsVisible)throw new Error('Tab did not close diagnostics');
     await click('Settings');await clickToggle('Enable developer diagnostics (Tab)');await click('Back');
@@ -93,9 +98,14 @@ fs.mkdirSync(directory,{recursive:true});
     for(const [helper,button,days] of [['PrepareDaySkip','Skip 1 day',1],['PrepareWeekSkip','Skip 1 week',7]]) {
      await send(helper);const initial=await summary();
      const control=initial.controls.find(control=>control.text===button);
+     if(!control)throw new Error('Skip control unavailable before '+days+'-day check: '+JSON.stringify({date:initial.date,busy:initial.skipInProgress,buttons:initial.controls.map(x=>x.text)}));
      await page.mouse.click(control.x,control.y);
-     let after,progressObserved=false;const deadline=Date.now()+60000;
-     do {await page.waitForTimeout(100);after=await summary();if(after.skipInProgress){progressObserved=true;if(days===7)await capture('12-simulated-skip-progress');}} while(after.skipInProgress && Date.now()<deadline);
+     let after,progressObserved=false,progressCaptured=false;const deadline=Date.now()+60000;
+     const target=Date.parse(initial.date)+days*86400000;
+     do {
+      await page.waitForTimeout(150);after=await summary();
+      if(after.skipInProgress){progressObserved=true;if(days===7&&!progressCaptured){await capture('12-simulated-skip-progress');progressCaptured=true;}}
+     } while((after.skipInProgress||Date.parse(after.date)<target) && Date.now()<deadline);
      if(after.skipInProgress||Date.parse(after.date)-Date.parse(initial.date)!==days*86400000||after.digest!==initial.expectedSkipDigest)throw new Error('Simulated '+days+'-day skip did not match ordinary clock ticking');
      skips.push({days,progressObserved,digestMatches:true});
     }
@@ -179,10 +189,10 @@ fs.mkdirSync(directory,{recursive:true});
   await page.screenshot({path:path.join(directory,'04-reloaded-snapshot.png')});
   if(verifyUi){await page.setViewportSize({width:1280,height:720});await page.waitForTimeout(650);await capture('09-compact-desktop');}
   timings.totalCheckSeconds=(Date.now()-startedAt)/1000;
-  const result={checkpoint,url,timings,browserGraphics,january,september,saved,reloaded,interactions,errors,errorCounts,passed:errors.length===0};
+  const result={checkpoint,url,timings,browserGraphics,january,september,saved,reloaded,interactions,errors,warnings,errorCounts,passed:errors.length===0};
   fs.writeFileSync(path.join(__dirname,checkpoint+'-browser.json'),JSON.stringify(result,null,2));
   fs.writeFileSync(path.join(__dirname,checkpoint+'-browser-console.json'),JSON.stringify(messages,null,2));
-  process.stdout.write(JSON.stringify({checkpoint,passed:result.passed,timings,browserGraphics,january:january.date,september:september.date,tracks:september.tracks,reloadDigestMatches:reloaded.digest===saved.digest,interactions,errors},null,2)+'\n');
+  process.stdout.write(JSON.stringify({checkpoint,passed:result.passed,timings,browserGraphics,january:january.date,september:september.date,tracks:september.tracks,reloadDigestMatches:reloaded.digest===saved.digest,interactions,errors,warnings},null,2)+'\n');
   if(errors.length)process.exitCode=1;
  } catch(error) {
   fs.writeFileSync(path.join(__dirname,checkpoint+'-browser-failure.json'),JSON.stringify({url,error:error.stack,errors,messages},null,2));

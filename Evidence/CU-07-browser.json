@@ -1,0 +1,837 @@
+{
+  "checkpoint": "CU-07",
+  "url": "http://localhost:8080/candidate/",
+  "timings": {
+    "playerReadySeconds": 2.69,
+    "totalCheckSeconds": 60.404
+  },
+  "browserGraphics": {
+    "renderer": "ANGLE (Intel, Intel(R) UHD Graphics 630 (0x00003E9B) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+  },
+  "january": {
+    "state": "Observer",
+    "date": "2425-01-01T00:00:00.0000000Z",
+    "digest": "14ca16afdbbde7ce4d5438791b5fe1ddb450620cddb0d8f0a5d466e5a6bed051",
+    "members": 24,
+    "labels": 8,
+    "tracks": 0,
+    "events": 2,
+    "cash": 1000000,
+    "snapshotRoundTrip": false,
+    "visibleRenderers": 217,
+    "paused": true,
+    "selectedMember": "",
+    "followingMember": "",
+    "followingOccluded": false,
+    "diagnosticsEnabled": false,
+    "diagnosticsVisible": false,
+    "statisticsVisible": false,
+    "skipInProgress": false,
+    "skipProgress": 0,
+    "minimumMemberSpacing": 0.829395055770874,
+    "memberColliders": 9,
+    "unresolvedMemberOverlaps": 0,
+    "recoveryAttempts": 0,
+    "recoveryFailures": 0,
+    "expectedSkipDigest": "",
+    "cameraDistance": 118,
+    "zoomTarget": 118,
+    "cameraPosition": {
+      "x": -38.49760437011719,
+      "y": 92.98527526855469,
+      "z": -61.60904312133789
+    },
+    "controls": [
+      {
+        "text": "Play",
+        "x": 574,
+        "y": 39,
+        "width": 58,
+        "height": 34
+      },
+      {
+        "text": "×1",
+        "x": 627.5,
+        "y": 39,
+        "width": 41,
+        "height": 34
+      },
+      {
+        "text": "×2",
+        "x": 672.5,
+        "y": 39,
+        "width": 41,
+        "height": 34
+      },
+      {
+        "text": "×4",
+        "x": 717.5,
+        "y": 39,
+        "width": 41,
+        "height": 34
+      },
+      {
+        "text": "Skip 1 day",
+        "x": 790.5,
+        "y": 39,
+        "width": 97,
+        "height": 34
+      },
+      {
+        "text": "Skip 1 week",
+        "x": 897.5,
+        "y": 39,
+        "width": 109,
+        "height": 34
+      },
+      {
+        "text": "Production",
+        "x": 1005.5,
+        "y": 39,
+        "width": 99,
+        "height": 34
+      },
+      {
+        "text": "Snapshots",
+        "x": 1308,
+        "y": 20,
+        "width": 98,
+        "height": 34
+      },
+      {
+        "text": "Settings",
+        "x": 1401,
+        "y": 20,
+        "width": 80,
+        "height": 34
+      },
+      {
+        "text": "Stats",
+        "x": 1474.5,
+        "y": 20,
+        "width": 59,
+        "height": 34
+      },
+      {
+        "text": "Inspect",
+        "x": 1545,
+        "y": 20,
+        "width": 74,
+        "height": 34
+      },
+      {
+        "text": "Menu",
+        "x": 1550.5,
+        "y": 60,
+        "width": 63,
+        "height": 34
+      },
+      {
+        "text": "History",
+        "x": 1546,
+        "y": 819,
+        "width": 54,
+        "height": 32
+      }
+    ],
+    "toggles": [
+      {
+        "text": "",
+        "x": 1009,
+        "y": 863,
+        "width": 550,
+        "height": 28
+      }
+    ],
+    "memberPoints": [
+      {
+        "id": "CRT-01-1",
+        "x": 482.64886474609375,
+        "y": 316.49517822265625
+      },
+      {
+        "id": "CRT-01-2",
+        "x": 514.5465698242188,
+        "y": 274.56671142578125
+      },
+      {
+        "id": "CRT-01-3",
+        "x": 525.5154418945312,
+        "y": 300.5042724609375
+      },
+      {
+        "id": "CRT-02-1",
+        "x": 483.7331237792969,
+        "y": 502.55963134765625
+      },
+      {
+        "id": "CRT-02-2",
+        "x": 409.0760192871094,
+        "y": 490.8612976074219
+      },
+      {
+        "id": "CRT-02-3",
+        "x": 469.88641357421875,
+        "y": 460.73016357421875
+      },
+      {
+        "id": "CRT-03-1",
+        "x": 677.1270751953125,
+        "y": 676.2090454101562
+      },
+      {
+        "id": "CRT-03-2",
+        "x": 745.785888671875,
+        "y": 644.668701171875
+      },
+      {
+        "id": "CRT-03-3",
+        "x": 742.0458984375,
+        "y": 639.4254760742188
+      }
+    ],
+    "hudText": [
+      "CENTRAL BLOOMVILLE",
+      "Watch the world grow",
+      "Jan 01, 2425   00:00 GST",
+      "PAUSED",
+      "Local snapshots ready",
+      "LATEST EVENTS",
+      "Jan 1 00:00   The five-minute world clock began",
+      "Every authoritative change advances on the deterministic five-minute spine.",
+      "Simulating the selected time span…"
+    ]
+  },
+  "september": {
+    "state": "Observer",
+    "date": "2425-09-30T12:00:00.0000000Z",
+    "digest": "78fe7d890f4024831ff3a4f5e61f024e6f7deaabe0d02fb3a3346c98bcc929ba",
+    "members": 24,
+    "labels": 8,
+    "tracks": 293,
+    "events": 600,
+    "cash": 277776,
+    "snapshotRoundTrip": false,
+    "visibleRenderers": 217,
+    "paused": true,
+    "selectedMember": "CRT-01-2",
+    "followingMember": "",
+    "followingOccluded": false,
+    "diagnosticsEnabled": false,
+    "diagnosticsVisible": false,
+    "statisticsVisible": false,
+    "skipInProgress": false,
+    "skipProgress": 1,
+    "minimumMemberSpacing": 0.7385808229446411,
+    "memberColliders": 9,
+    "unresolvedMemberOverlaps": 0,
+    "recoveryAttempts": 0,
+    "recoveryFailures": 0,
+    "expectedSkipDigest": "670817c0bc56106d9661b1c90114bbc4d44a5942ca9b98f232d416003dd3d53a",
+    "cameraDistance": 118,
+    "zoomTarget": 118,
+    "cameraPosition": {
+      "x": -38.49760437011719,
+      "y": 92.98527526855469,
+      "z": -61.60904312133789
+    },
+    "controls": [
+      {
+        "text": "Play",
+        "x": 575,
+        "y": 39,
+        "width": 58,
+        "height": 34
+      },
+      {
+        "text": "×1",
+        "x": 628.5,
+        "y": 39,
+        "width": 41,
+        "height": 34
+      },
+      {
+        "text": "×2",
+        "x": 673.5,
+        "y": 39,
+        "width": 41,
+        "height": 34
+      },
+      {
+        "text": "×4",
+        "x": 718.5,
+        "y": 39,
+        "width": 41,
+        "height": 34
+      },
+      {
+        "text": "Skip 1 day",
+        "x": 791.5,
+        "y": 39,
+        "width": 97,
+        "height": 34
+      },
+      {
+        "text": "Skip 1 week",
+        "x": 898.5,
+        "y": 39,
+        "width": 109,
+        "height": 34
+      },
+      {
+        "text": "Production",
+        "x": 1006.5,
+        "y": 39,
+        "width": 99,
+        "height": 34
+      },
+      {
+        "text": "Snapshots",
+        "x": 1308,
+        "y": 20,
+        "width": 98,
+        "height": 34
+      },
+      {
+        "text": "Settings",
+        "x": 1401,
+        "y": 20,
+        "width": 80,
+        "height": 34
+      },
+      {
+        "text": "Stats",
+        "x": 1474.5,
+        "y": 20,
+        "width": 59,
+        "height": 34
+      },
+      {
+        "text": "Inspect",
+        "x": 1545,
+        "y": 20,
+        "width": 74,
+        "height": 34
+      },
+      {
+        "text": "Menu",
+        "x": 1550.5,
+        "y": 66,
+        "width": 63,
+        "height": 34
+      },
+      {
+        "text": "History",
+        "x": 1546,
+        "y": 819,
+        "width": 54,
+        "height": 32
+      }
+    ],
+    "toggles": [
+      {
+        "text": "",
+        "x": 1009,
+        "y": 863,
+        "width": 550,
+        "height": 28
+      }
+    ],
+    "memberPoints": [
+      {
+        "id": "CRT-01-1",
+        "x": 416.8881530761719,
+        "y": 341.02642822265625
+      },
+      {
+        "id": "CRT-01-2",
+        "x": 508.3839416503906,
+        "y": 306.89501953125
+      },
+      {
+        "id": "CRT-01-3",
+        "x": 462.47454833984375,
+        "y": 324.0213623046875
+      },
+      {
+        "id": "CRT-02-1",
+        "x": 565.3892822265625,
+        "y": 466.9883728027344
+      },
+      {
+        "id": "CRT-02-2",
+        "x": 442.04473876953125,
+        "y": 521.3146362304688
+      },
+      {
+        "id": "CRT-02-3",
+        "x": 512.3800048828125,
+        "y": 490.8628234863281
+      },
+      {
+        "id": "CRT-03-1",
+        "x": 610.9306640625,
+        "y": 713.7164916992188
+      },
+      {
+        "id": "CRT-03-2",
+        "x": 617.274169921875,
+        "y": 711.2965087890625
+      },
+      {
+        "id": "CRT-03-3",
+        "x": 594.7294921875,
+        "y": 720.268310546875
+      }
+    ],
+    "hudText": [
+      "CENTRAL BLOOMVILLE",
+      "Watch the world grow",
+      "Sep 30, 2425   12:00 GST",
+      "PAUSED",
+      "Simulated through Jan 9, 2425 00:15",
+      "LATEST EVENTS",
+      "Sep 30 00:00   City of Echoes 832 was released as a Track",
+      "Release preserved the Master and created a separate Track referencing it. No Act was required.",
+      "Simulating the selected time span…"
+    ]
+  },
+  "saved": {
+    "state": "Observer",
+    "date": "2425-09-30T12:00:00.0000000Z",
+    "digest": "78fe7d890f4024831ff3a4f5e61f024e6f7deaabe0d02fb3a3346c98bcc929ba",
+    "members": 24,
+    "labels": 8,
+    "tracks": 293,
+    "events": 600,
+    "cash": 277776,
+    "snapshotRoundTrip": true,
+    "visibleRenderers": 217,
+    "paused": true,
+    "selectedMember": "CRT-01-2",
+    "followingMember": "",
+    "followingOccluded": false,
+    "diagnosticsEnabled": false,
+    "diagnosticsVisible": false,
+    "statisticsVisible": false,
+    "skipInProgress": false,
+    "skipProgress": 1,
+    "minimumMemberSpacing": 0.6408951878547668,
+    "memberColliders": 9,
+    "unresolvedMemberOverlaps": 0,
+    "recoveryAttempts": 0,
+    "recoveryFailures": 0,
+    "expectedSkipDigest": "670817c0bc56106d9661b1c90114bbc4d44a5942ca9b98f232d416003dd3d53a",
+    "cameraDistance": 118,
+    "zoomTarget": 118,
+    "cameraPosition": {
+      "x": -38.49760437011719,
+      "y": 92.98527526855469,
+      "z": -61.60904312133789
+    },
+    "controls": [
+      {
+        "text": "Play",
+        "x": 575,
+        "y": 39,
+        "width": 58,
+        "height": 34
+      },
+      {
+        "text": "×1",
+        "x": 628.5,
+        "y": 39,
+        "width": 41,
+        "height": 34
+      },
+      {
+        "text": "×2",
+        "x": 673.5,
+        "y": 39,
+        "width": 41,
+        "height": 34
+      },
+      {
+        "text": "×4",
+        "x": 718.5,
+        "y": 39,
+        "width": 41,
+        "height": 34
+      },
+      {
+        "text": "Skip 1 day",
+        "x": 791.5,
+        "y": 39,
+        "width": 97,
+        "height": 34
+      },
+      {
+        "text": "Skip 1 week",
+        "x": 898.5,
+        "y": 39,
+        "width": 109,
+        "height": 34
+      },
+      {
+        "text": "Production",
+        "x": 1006.5,
+        "y": 39,
+        "width": 99,
+        "height": 34
+      },
+      {
+        "text": "Snapshots",
+        "x": 1308,
+        "y": 20,
+        "width": 98,
+        "height": 34
+      },
+      {
+        "text": "Settings",
+        "x": 1401,
+        "y": 20,
+        "width": 80,
+        "height": 34
+      },
+      {
+        "text": "Stats",
+        "x": 1474.5,
+        "y": 20,
+        "width": 59,
+        "height": 34
+      },
+      {
+        "text": "Inspect",
+        "x": 1545,
+        "y": 20,
+        "width": 74,
+        "height": 34
+      },
+      {
+        "text": "Menu",
+        "x": 1550.5,
+        "y": 66,
+        "width": 63,
+        "height": 34
+      },
+      {
+        "text": "History",
+        "x": 1546,
+        "y": 819,
+        "width": 54,
+        "height": 32
+      }
+    ],
+    "toggles": [
+      {
+        "text": "",
+        "x": 1009,
+        "y": 863,
+        "width": 550,
+        "height": 28
+      }
+    ],
+    "memberPoints": [
+      {
+        "id": "CRT-01-1",
+        "x": 460.4384460449219,
+        "y": 324.780517578125
+      },
+      {
+        "id": "CRT-01-2",
+        "x": 536.9928588867188,
+        "y": 310.5655517578125
+      },
+      {
+        "id": "CRT-01-3",
+        "x": 504.46051025390625,
+        "y": 308.3590087890625
+      },
+      {
+        "id": "CRT-02-1",
+        "x": 517.0844116210938,
+        "y": 488.7440185546875
+      },
+      {
+        "id": "CRT-02-2",
+        "x": 456.9208679199219,
+        "y": 514.6220703125
+      },
+      {
+        "id": "CRT-02-3",
+        "x": 461.84295654296875,
+        "y": 513.623779296875
+      },
+      {
+        "id": "CRT-03-1",
+        "x": 666.28564453125,
+        "y": 685.2515869140625
+      },
+      {
+        "id": "CRT-03-2",
+        "x": 672.8814086914062,
+        "y": 679.760498046875
+      },
+      {
+        "id": "CRT-03-3",
+        "x": 651.2614135742188,
+        "y": 688.301025390625
+      }
+    ],
+    "hudText": [
+      "CENTRAL BLOOMVILLE",
+      "Watch the world grow",
+      "Sep 30, 2425   12:00 GST",
+      "PAUSED",
+      "Saved “My observation” locally",
+      "LATEST EVENTS",
+      "Sep 30 00:00   City of Echoes 832 was released as a Track",
+      "Release preserved the Master and created a separate Track referencing it. No Act was required.",
+      "Simulating the selected time span…"
+    ]
+  },
+  "reloaded": {
+    "state": "Observer",
+    "date": "2425-09-30T12:00:00.0000000Z",
+    "digest": "78fe7d890f4024831ff3a4f5e61f024e6f7deaabe0d02fb3a3346c98bcc929ba",
+    "members": 24,
+    "labels": 8,
+    "tracks": 293,
+    "events": 600,
+    "cash": 277776,
+    "snapshotRoundTrip": false,
+    "visibleRenderers": 220,
+    "paused": true,
+    "selectedMember": "",
+    "followingMember": "",
+    "followingOccluded": false,
+    "diagnosticsEnabled": false,
+    "diagnosticsVisible": false,
+    "statisticsVisible": false,
+    "skipInProgress": false,
+    "skipProgress": 0,
+    "minimumMemberSpacing": 7.327972412109375,
+    "memberColliders": 9,
+    "unresolvedMemberOverlaps": 0,
+    "recoveryAttempts": 0,
+    "recoveryFailures": 0,
+    "expectedSkipDigest": "",
+    "cameraDistance": 118,
+    "zoomTarget": 118,
+    "cameraPosition": {
+      "x": -38.49760437011719,
+      "y": 92.98527526855469,
+      "z": -61.60904312133789
+    },
+    "controls": [
+      {
+        "text": "Play",
+        "x": 575,
+        "y": 39,
+        "width": 58,
+        "height": 34
+      },
+      {
+        "text": "×1",
+        "x": 628.5,
+        "y": 39,
+        "width": 41,
+        "height": 34
+      },
+      {
+        "text": "×2",
+        "x": 673.5,
+        "y": 39,
+        "width": 41,
+        "height": 34
+      },
+      {
+        "text": "×4",
+        "x": 718.5,
+        "y": 39,
+        "width": 41,
+        "height": 34
+      },
+      {
+        "text": "Skip 1 day",
+        "x": 791.5,
+        "y": 39,
+        "width": 97,
+        "height": 34
+      },
+      {
+        "text": "Skip 1 week",
+        "x": 898.5,
+        "y": 39,
+        "width": 109,
+        "height": 34
+      },
+      {
+        "text": "Production",
+        "x": 1006.5,
+        "y": 39,
+        "width": 99,
+        "height": 34
+      },
+      {
+        "text": "Snapshots",
+        "x": 1308,
+        "y": 20,
+        "width": 98,
+        "height": 34
+      },
+      {
+        "text": "Settings",
+        "x": 1401,
+        "y": 20,
+        "width": 80,
+        "height": 34
+      },
+      {
+        "text": "Stats",
+        "x": 1474.5,
+        "y": 20,
+        "width": 59,
+        "height": 34
+      },
+      {
+        "text": "Inspect",
+        "x": 1545,
+        "y": 20,
+        "width": 74,
+        "height": 34
+      },
+      {
+        "text": "Menu",
+        "x": 1550.5,
+        "y": 60,
+        "width": 63,
+        "height": 34
+      },
+      {
+        "text": "History",
+        "x": 1546,
+        "y": 819,
+        "width": 54,
+        "height": 32
+      }
+    ],
+    "toggles": [
+      {
+        "text": "",
+        "x": 1009,
+        "y": 863,
+        "width": 550,
+        "height": 28
+      }
+    ],
+    "memberPoints": [
+      {
+        "id": "CRT-01-1",
+        "x": 441.9617614746094,
+        "y": 331.67303466796875
+      },
+      {
+        "id": "CRT-01-2",
+        "x": 528.4443969726562,
+        "y": 296.855712890625
+      },
+      {
+        "id": "CRT-01-3",
+        "x": 486.2639465332031,
+        "y": 315.1466064453125
+      },
+      {
+        "id": "CRT-02-1",
+        "x": 531.010498046875,
+        "y": 481.2902526855469
+      },
+      {
+        "id": "CRT-02-2",
+        "x": 423.1417541503906,
+        "y": 525.939453125
+      },
+      {
+        "id": "CRT-02-3",
+        "x": 515.6458129882812,
+        "y": 441.04486083984375
+      },
+      {
+        "id": "CRT-03-1",
+        "x": 624.48193359375,
+        "y": 706.0382080078125
+      },
+      {
+        "id": "CRT-03-2",
+        "x": 774.3941040039062,
+        "y": 690.71533203125
+      },
+      {
+        "id": "CRT-03-3",
+        "x": 692.4510498046875,
+        "y": 667.5263671875
+      }
+    ],
+    "hudText": [
+      "CENTRAL BLOOMVILLE",
+      "Watch the world grow",
+      "Sep 30, 2425   12:00 GST",
+      "PAUSED",
+      "Local snapshots ready",
+      "LATEST EVENTS",
+      "Sep 30 00:00   City of Echoes 832 was released as a Track",
+      "Release preserved the Master and created a separate Track referencing it. No Act was required.",
+      "Simulating the selected time span…"
+    ]
+  },
+  "interactions": [
+    {
+      "name": "player-stats-gated-diagnostics-clock-skips-member-spacing",
+      "skips": [
+        {
+          "days": 1,
+          "progressObserved": false,
+          "digestMatches": true
+        },
+        {
+          "days": 7,
+          "progressObserved": true,
+          "digestMatches": true
+        }
+      ],
+      "colliders": 9,
+      "spacing": 0.7805374264717102,
+      "recoveries": 0,
+      "passed": true
+    },
+    {
+      "name": "play-pause-gated-step",
+      "passed": true
+    },
+    {
+      "name": "wheel-zoom",
+      "before": 118,
+      "zoomed": 106.77114868164062,
+      "reversed": 117.99971771240234,
+      "passed": true
+    },
+    {
+      "name": "member-selection-follow-cancel",
+      "member": "CRT-01-2",
+      "occluded": false,
+      "settleSeconds": 2.834,
+      "passed": true
+    },
+    {
+      "name": "production-history-named-snapshot-controls",
+      "passed": true
+    }
+  ],
+  "errors": [],
+  "warnings": [
+    "Manual synchronization of Unity Application.persistentDataPath via JS_FileSystem_Sync() is deprecated and will be later removed in a future Unity version. The persistent data directory will be automatically synchronized instead on file modification. Pass config.autoSyncPersistentDataPath = true; to configuration in createUnityInstance() to opt in to the new behavior.",
+    "warning: 2 FS.syncfs operations in flight at once, probably just doing extra work"
+  ],
+  "errorCounts": {},
+  "passed": true
+}

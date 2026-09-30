@@ -1,0 +1,194 @@
+{
+  "state": "Observer",
+  "date": "2425-01-01T00:00:00.0000000Z",
+  "digest": "14ca16afdbbde7ce4d5438791b5fe1ddb450620cddb0d8f0a5d466e5a6bed051",
+  "members": 24,
+  "labels": 8,
+  "tracks": 0,
+  "events": 2,
+  "cash": 1000000,
+  "snapshotRoundTrip": false,
+  "visibleRenderers": 217,
+  "paused": true,
+  "selectedMember": "",
+  "followingMember": "",
+  "followingOccluded": false,
+  "diagnosticsEnabled": false,
+  "diagnosticsVisible": false,
+  "statisticsVisible": false,
+  "skipInProgress": false,
+  "skipProgress": 0,
+  "minimumMemberSpacing": 0.829395055770874,
+  "memberColliders": 9,
+  "unresolvedMemberOverlaps": 0,
+  "recoveryAttempts": 0,
+  "recoveryFailures": 0,
+  "expectedSkipDigest": "",
+  "cameraDistance": 118,
+  "zoomTarget": 118,
+  "cameraPosition": {
+    "x": -38.49760437011719,
+    "y": 92.98527526855469,
+    "z": -61.60904312133789
+  },
+  "controls": [
+    {
+      "text": "Play",
+      "x": 574,
+      "y": 39,
+      "width": 58,
+      "height": 34
+    },
+    {
+      "text": "×1",
+      "x": 627.5,
+      "y": 39,
+      "width": 41,
+      "height": 34
+    },
+    {
+      "text": "×2",
+      "x": 672.5,
+      "y": 39,
+      "width": 41,
+      "height": 34
+    },
+    {
+      "text": "×4",
+      "x": 717.5,
+      "y": 39,
+      "width": 41,
+      "height": 34
+    },
+    {
+      "text": "Skip 1 day",
+      "x": 790.5,
+      "y": 39,
+      "width": 97,
+      "height": 34
+    },
+    {
+      "text": "Skip 1 week",
+      "x": 897.5,
+      "y": 39,
+      "width": 109,
+      "height": 34
+    },
+    {
+      "text": "Production",
+      "x": 1005.5,
+      "y": 39,
+      "width": 99,
+      "height": 34
+    },
+    {
+      "text": "Snapshots",
+      "x": 1308,
+      "y": 20,
+      "width": 98,
+      "height": 34
+    },
+    {
+      "text": "Settings",
+      "x": 1401,
+      "y": 20,
+      "width": 80,
+      "height": 34
+    },
+    {
+      "text": "Stats",
+      "x": 1474.5,
+      "y": 20,
+      "width": 59,
+      "height": 34
+    },
+    {
+      "text": "Inspect",
+      "x": 1545,
+      "y": 20,
+      "width": 74,
+      "height": 34
+    },
+    {
+      "text": "Menu",
+      "x": 1550.5,
+      "y": 60,
+      "width": 63,
+      "height": 34
+    },
+    {
+      "text": "History",
+      "x": 1546,
+      "y": 819,
+      "width": 54,
+      "height": 32
+    }
+  ],
+  "toggles": [
+    {
+      "text": "",
+      "x": 1009,
+      "y": 863,
+      "width": 550,
+      "height": 28
+    }
+  ],
+  "memberPoints": [
+    {
+      "id": "CRT-01-1",
+      "x": 482.64886474609375,
+      "y": 316.49517822265625
+    },
+    {
+      "id": "CRT-01-2",
+      "x": 514.5465698242188,
+      "y": 274.56671142578125
+    },
+    {
+      "id": "CRT-01-3",
+      "x": 525.5154418945312,
+      "y": 300.5042724609375
+    },
+    {
+      "id": "CRT-02-1",
+      "x": 483.7331237792969,
+      "y": 502.55963134765625
+    },
+    {
+      "id": "CRT-02-2",
+      "x": 409.0760192871094,
+      "y": 490.8612976074219
+    },
+    {
+      "id": "CRT-02-3",
+      "x": 469.88641357421875,
+      "y": 460.73016357421875
+    },
+    {
+      "id": "CRT-03-1",
+      "x": 677.1270751953125,
+      "y": 676.2090454101562
+    },
+    {
+      "id": "CRT-03-2",
+      "x": 745.785888671875,
+      "y": 644.668701171875
+    },
+    {
+      "id": "CRT-03-3",
+      "x": 742.0458984375,
+      "y": 639.4254760742188
+    }
+  ],
+  "hudText": [
+    "CENTRAL BLOOMVILLE",
+    "Watch the world grow",
+    "Jan 01, 2425   00:00 GST",
+    "PAUSED",
+    "Local snapshots ready",
+    "LATEST EVENTS",
+    "Jan 1 00:00   The five-minute world clock began",
+    "Every authoritative change advances on the deterministic five-minute spine.",
+    "Simulating the selected time span…"
+  ]
+}
