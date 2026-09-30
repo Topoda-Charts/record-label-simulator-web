@@ -1,68 +1,101 @@
 import * as THREE from "three";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { Palette } from "../config/palette.js";
+import { createDistrictBuilding } from "./buildingModule.js";
+
+const SKY_COLOR = 0xc8d4e8;
+const FOG_NEAR = 22;
+const FOG_FAR = 72;
 
 export function createBloomvilleScene(canvas) {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-  renderer.setClearColor(0x120f18, 1);
+  renderer.setClearColor(SKY_COLOR, 1);
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.05;
 
   const scene = new THREE.Scene();
-  scene.fog = new THREE.Fog(0x1a1820, 28, 95);
+  scene.background = new THREE.Color(SKY_COLOR);
+  scene.fog = new THREE.Fog(SKY_COLOR, FOG_NEAR, FOG_FAR);
 
-  const camera = new THREE.PerspectiveCamera(48, 1, 0.1, 200);
-  camera.position.set(14, 11, 16);
+  const camera = new THREE.PerspectiveCamera(42, 1, 0.2, 120);
+  camera.position.set(11.5, 7.2, 13.5);
+  camera.lookAt(0, 1.4, -0.5);
 
-  const controls = new OrbitControls(camera, canvas);
-  controls.enableDamping = true;
-  controls.target.set(0, 2, 0);
-  controls.maxPolarAngle = Math.PI * 0.49;
-  controls.minDistance = 8;
-  controls.maxDistance = 40;
-
-  const hemi = new THREE.HemisphereLight(0xdde8ff, 0x2a2630, 0.55);
+  const hemi = new THREE.HemisphereLight(0xe8eef8, 0x5a5248, 0.62);
   scene.add(hemi);
 
-  const sun = new THREE.DirectionalLight(0xfff2e0, 1.1);
-  sun.position.set(10, 18, 6);
+  const sun = new THREE.DirectionalLight(0xfff0dc, 1.15);
+  sun.position.set(14, 20, 10);
   sun.castShadow = true;
-  sun.shadow.mapSize.set(1024, 1024);
+  sun.shadow.camera.left = -18;
+  sun.shadow.camera.right = 18;
+  sun.shadow.camera.top = 18;
+  sun.shadow.camera.bottom = -18;
+  sun.shadow.camera.near = 4;
+  sun.shadow.camera.far = 48;
+  sun.shadow.mapSize.set(2048, 2048);
+  sun.shadow.bias = -0.00025;
   scene.add(sun);
-
-  const anngloraGlow = new THREE.PointLight(Palette.annglora, 0.9, 22);
-  anngloraGlow.position.set(-6, 4, -4);
-  scene.add(anngloraGlow);
-
-  const byteriaGlow = new THREE.PointLight(Palette.byteria, 0.65, 18);
-  byteriaGlow.position.set(8, 3.5, 2);
-  scene.add(byteriaGlow);
-
-  const crowniaBounce = new THREE.PointLight(Palette.crownia, 0.45, 16);
-  crowniaBounce.position.set(2, 2.5, -9);
-  scene.add(crowniaBounce);
+  scene.add(sun.target);
+  sun.target.position.set(0, 0, 0);
 
   const ground = new THREE.Mesh(
-    new THREE.PlaneGeometry(80, 80),
-    new THREE.MeshStandardMaterial({ color: Palette.ground, roughness: 0.92 }),
+    new THREE.PlaneGeometry(90, 90),
+    new THREE.MeshStandardMaterial({
+      color: Palette.groundTint,
+      roughness: 0.94,
+      metalness: 0.02,
+    }),
   );
   ground.rotation.x = -Math.PI / 2;
   ground.receiveShadow = true;
   scene.add(ground);
 
   const plaza = new THREE.Mesh(
-    new THREE.CircleGeometry(7, 48),
-    new THREE.MeshStandardMaterial({ color: 0x3a3542, roughness: 0.85 }),
+    new THREE.CircleGeometry(5.5, 40),
+    new THREE.MeshStandardMaterial({
+      color: Palette.plaza,
+      roughness: 0.88,
+      metalness: 0.03,
+    }),
   );
   plaza.rotation.x = -Math.PI / 2;
-  plaza.position.y = 0.02;
+  plaza.position.y = 0.015;
   plaza.receiveShadow = true;
   scene.add(plaza);
 
-  addRoadGrid(scene);
-  addCityHall(scene);
-  addLabelPads(scene);
+  const buildings = [];
+  const layout = [
+    { x: -5.5, z: -3.5, floors: 2, roofKind: "gable", roofRise: 0.75, w: 2.3, d: 2.1 },
+    { x: -2.2, z: -5.2, floors: 3, roofKind: "sawtooth", roofRise: 0.9, w: 2.5, d: 2.4 },
+    { x: 1.8, z: -4.8, floors: 2, roofKind: "flat", roofRise: 0.2, w: 2.8, d: 2.2 },
+    { x: 5.2, z: -2.8, floors: 4, roofKind: "gable", roofRise: 1.05, w: 2.4, d: 2.6 },
+    { x: -4.2, z: 1.2, floors: 3, roofKind: "gable", roofRise: 0.95, w: 2.6, d: 2.3 },
+    { x: -0.6, z: 2.4, floors: 2, roofKind: "flat", roofRise: 0.18, w: 3.2, d: 2.5 },
+    { x: 3.4, z: 1.6, floors: 3, roofKind: "sawtooth", roofRise: 0.85, w: 2.5, d: 2.2 },
+    { x: 6.0, z: 3.8, floors: 2, roofKind: "gable", roofRise: 0.7, w: 2.2, d: 2.0 },
+  ];
+
+  for (const slot of layout) {
+    const built = createDistrictBuilding({
+      width: slot.w,
+      depth: slot.d,
+      floors: slot.floors,
+      roofKind: slot.roofKind,
+      roofRise: slot.roofRise,
+      wallColor: Palette.structureWall,
+      roofColor: Palette.structureRoof,
+    });
+    built.group.position.set(slot.x, 0, slot.z);
+    scene.add(built.group);
+    buildings.push(built);
+  }
+
+  const trees = addSoftTrees(scene);
+  let activeIndex = 0;
+  setActiveBuilding(0);
 
   let frameId = 0;
   const clock = new THREE.Clock();
@@ -79,9 +112,9 @@ export function createBloomvilleScene(canvas) {
   function animate() {
     frameId = requestAnimationFrame(animate);
     const t = clock.getElapsedTime();
-    anngloraGlow.intensity = 0.75 + Math.sin(t * 0.8) * 0.12;
-    byteriaGlow.intensity = 0.55 + Math.sin(t * 1.1 + 1) * 0.1;
-    controls.update();
+    for (let i = 0; i < trees.length; i += 1) {
+      trees[i].rotation.y = Math.sin(t * 0.35 + i) * 0.02;
+    }
     renderer.render(scene, camera);
   }
 
@@ -91,77 +124,49 @@ export function createBloomvilleScene(canvas) {
   const ro = new ResizeObserver(resize);
   ro.observe(canvas);
 
+  function setActiveBuilding(index) {
+    activeIndex = ((index % buildings.length) + buildings.length) % buildings.length;
+    buildings.forEach((b, i) => b.setActive(i === activeIndex));
+  }
+
   return {
+    setActiveBuilding,
+    getActiveBuildingIndex: () => activeIndex,
     dispose() {
       cancelAnimationFrame(frameId);
       ro.disconnect();
-      controls.dispose();
       renderer.dispose();
     },
   };
 }
 
-function addRoadGrid(scene) {
-  const roadMat = new THREE.MeshStandardMaterial({ color: Palette.road, roughness: 0.9 });
-  for (let i = -1; i <= 1; i += 1) {
-    const h = new THREE.Mesh(new THREE.BoxGeometry(36, 0.08, 1.2), roadMat);
-    h.position.set(0, 0.04, i * 6);
-    h.receiveShadow = true;
-    scene.add(h);
-
-    const v = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.08, 36), roadMat);
-    v.position.set(i * 6, 0.04, 0);
-    v.receiveShadow = true;
-    scene.add(v);
-  }
-}
-
-function addCityHall(scene) {
-  const base = new THREE.Mesh(
-    new THREE.BoxGeometry(5.5, 3.2, 5.5),
-    new THREE.MeshStandardMaterial({ color: Palette.anngloraFlora, roughness: 0.55, metalness: 0.05 }),
-  );
-  base.position.set(0, 1.6, 0);
-  base.castShadow = true;
-  base.receiveShadow = true;
-  scene.add(base);
-
-  const crown = new THREE.Mesh(
-    new THREE.BoxGeometry(3.2, 1.4, 3.2),
-    new THREE.MeshStandardMaterial({ color: Palette.annglora, roughness: 0.4, emissive: 0x221133, emissiveIntensity: 0.35 }),
-  );
-  crown.position.set(0, 3.5, 0);
-  crown.castShadow = true;
-  scene.add(crown);
-}
-
-function addLabelPads(scene) {
-  const pads = [
-    { name: "ARL", color: Palette.annglora, pos: [-7, 0, -6], h: 2.8 },
-    { name: "BRL", color: Palette.byteria, pos: [7, 0, 1], h: 3.4 },
-    { name: "CRL", color: Palette.crownia, pos: [1, 0, -8], h: 2.5 },
+function addSoftTrees(scene) {
+  const trunkMat = new THREE.MeshStandardMaterial({ color: 0x6b5d52, roughness: 0.9 });
+  const leafMat = new THREE.MeshStandardMaterial({
+    color: Palette.anngloraFlora,
+    roughness: 0.75,
+    metalness: 0.02,
+  });
+  const trees = [];
+  const spots = [
+    [-7.5, -1.5],
+    [-7, 4.5],
+    [7.5, -0.5],
+    [8, 5],
+    [-1, 6.2],
   ];
-
-  for (const pad of pads) {
-    const slab = new THREE.Mesh(
-      new THREE.BoxGeometry(4.2, 0.25, 4.2),
-      new THREE.MeshStandardMaterial({ color: pad.color, roughness: 0.45, metalness: 0.15 }),
-    );
-    slab.position.set(pad.pos[0], 0.12, pad.pos[2]);
-    slab.receiveShadow = true;
-    scene.add(slab);
-
-    const hq = new THREE.Mesh(
-      new THREE.BoxGeometry(2.6, pad.h, 2.6),
-      new THREE.MeshStandardMaterial({
-        color: pad.color,
-        roughness: 0.35,
-        emissive: pad.color,
-        emissiveIntensity: pad.name === "BRL" ? 0.25 : 0.12,
-      }),
-    );
-    hq.position.set(pad.pos[0], pad.h / 2 + 0.25, pad.pos[2]);
-    hq.castShadow = true;
-    scene.add(hq);
+  for (const [x, z] of spots) {
+    const tree = new THREE.Group();
+    const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.16, 0.9, 8), trunkMat);
+    trunk.position.y = 0.45;
+    trunk.castShadow = true;
+    const crown = new THREE.Mesh(new THREE.SphereGeometry(0.55, 10, 8), leafMat);
+    crown.position.y = 1.15;
+    crown.castShadow = true;
+    tree.add(trunk, crown);
+    tree.position.set(x, 0, z);
+    scene.add(tree);
+    trees.push(tree);
   }
+  return trees;
 }

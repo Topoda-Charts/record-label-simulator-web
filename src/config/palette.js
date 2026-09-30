@@ -5,12 +5,18 @@
  */
 export const Palette = {
   appBg: 0xfaf7f2,
+  surfaceCard: 0xf2ede6,
+  surfaceRaised: 0xe8e2da,
   ink: 0x3f3a36,
   labelCoral: 0xe88b7d,
   annglora: 0xcc99ff,
   anngloraFlora: 0x8fb996,
   byteria: 0x3333ff,
   crownia: 0xffd700,
+  groundTint: 0x7a8f7e,
+  plaza: 0xd8d1c8,
+  structureWall: 0xc9bdd4,
+  structureRoof: 0xa894c4,
   ground: 0x2a2630,
   road: 0x4a4550,
 };
