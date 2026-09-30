@@ -21,7 +21,7 @@ export function createBloomvilleScene(canvas) {
 
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(SKY_COLOR);
-  scene.fog = new THREE.Fog(SKY_COLOR, 62, 118);
+  scene.fog = new THREE.Fog(SKY_COLOR, 108, 188);
 
   /** Orthographic three-quarter: isotropic X/Z, south elevated toward City Hall (north). */
   const viewTarget = new THREE.Vector3(0, 8, -2);
