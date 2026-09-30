@@ -57,10 +57,10 @@ export function createDistrictBuilding(spec) {
   group.add(body);
 
   const plinth = new THREE.Mesh(
-    new THREE.BoxGeometry(width + 0.16, 0.18, depth + 0.16),
+    new THREE.BoxGeometry(width + 0.4, 0.35, depth + 0.4),
     trimMat,
   );
-  plinth.position.y = 0.09;
+  plinth.position.y = 0.17;
   plinth.castShadow = true;
   plinth.receiveShadow = true;
   group.add(plinth);
@@ -95,23 +95,33 @@ function buildRoof(kind, width, depth, rise, material) {
 
   if (kind === "flat") {
     const slab = new THREE.Mesh(
-      new THREE.BoxGeometry(width + 0.28, 0.22, depth + 0.28),
+      new THREE.BoxGeometry(width + 0.5, 0.45, depth + 0.5),
       material,
     );
-    slab.position.y = 0.11;
-    roofGroup.add(slab);
+    slab.position.y = 0.22;
+    const lip = new THREE.Mesh(
+      new THREE.BoxGeometry(width + 0.65, 0.12, depth + 0.65),
+      material,
+    );
+    lip.position.y = 0.48;
+    roofGroup.add(slab, lip);
     return roofGroup;
   }
 
   if (kind === "sawtooth") {
-    const step = new THREE.Mesh(new THREE.BoxGeometry(width * 0.55, rise, depth + 0.08), material);
-    step.position.set(-width * 0.2, rise / 2, 0);
+    const step = new THREE.Mesh(new THREE.BoxGeometry(width * 0.52, rise, depth + 0.2), material);
+    step.position.set(-width * 0.22, rise / 2, 0);
     const step2 = new THREE.Mesh(
-      new THREE.BoxGeometry(width * 0.4, rise * 0.62, depth + 0.08),
+      new THREE.BoxGeometry(width * 0.38, rise * 0.68, depth + 0.2),
       material,
     );
-    step2.position.set(width * 0.24, rise * 0.31, 0);
-    roofGroup.add(step, step2);
+    step2.position.set(width * 0.26, rise * 0.34, 0);
+    const step3 = new THREE.Mesh(
+      new THREE.BoxGeometry(width * 0.28, rise * 0.45, depth + 0.2),
+      material,
+    );
+    step3.position.set(width * 0.08, rise * 0.22, 0);
+    roofGroup.add(step, step2, step3);
     return roofGroup;
   }
 

@@ -13,12 +13,16 @@ export const Palette = {
   anngloraFlora: 0x8fb996,
   byteria: 0x3333ff,
   crownia: 0xffd700,
-  groundTint: 0x7a8f7e,
-  plaza: 0xd8d1c8,
-  structureWall: 0xc9bdd4,
-  structureRoof: 0xa894c4,
+  groundTint: 0x5f6d58,
+  plaza: 0xd4c8b8,
+  stone: 0xe4d9cc,
+  road: 0x6e675f,
+  sidewalk: 0xcfc4b6,
+  structureWall: 0xd7c6c0,
+  structureWallLilac: 0xcbb8d4,
+  structureRoof: 0x6d587f,
+  structureRoofWarm: 0x8d6a62,
   ground: 0x2a2630,
-  road: 0x4a4550,
 };
 
 export function hexColor(hex) {

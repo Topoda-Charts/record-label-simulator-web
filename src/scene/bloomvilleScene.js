@@ -2,13 +2,13 @@ import * as THREE from "three";
 import { Palette } from "../config/palette.js";
 import { createDistrictBuilding } from "./buildingModule.js";
 
-/** 1 unit = 1 m · 24 m lots · 12 m street (Drive reconciliation). */
+/** 1 unit = 1 m · 24 m lots · 12 m street. */
 const LOT_M = 24;
 const STREET_M = 12;
 const SIDEWALK_M = 2;
 const MAIN_SPAN_M = LOT_M * 4 + STREET_M;
 const SKY_COLOR = 0xd7e2f0;
-const ORTHO_HALF_H = 52;
+const ORTHO_HALF_H = 40;
 
 export function createBloomvilleScene(canvas) {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
@@ -17,43 +17,45 @@ export function createBloomvilleScene(canvas) {
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.setClearColor(SKY_COLOR, 1);
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.1;
+  renderer.toneMappingExposure = 1.08;
 
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(SKY_COLOR);
-  scene.fog = new THREE.Fog(SKY_COLOR, 108, 188);
+  /** Fog starts beyond the built slice so the street stays crisp. */
+  scene.fog = new THREE.Fog(SKY_COLOR, 150, 215);
 
-  /** Orthographic three-quarter: isotropic X/Z, south elevated toward City Hall (north). */
-  const viewTarget = new THREE.Vector3(0, 8, -2);
-  const camera = new THREE.OrthographicCamera(-92, 92, 52, -52, 0.5, 240);
-  camera.position.set(72, 78, 86);
+  const viewTarget = new THREE.Vector3(0, 7, -1);
+  const camera = new THREE.OrthographicCamera(-72, 72, 40, -40, 0.5, 260);
+  camera.position.set(56, 54, 70);
   camera.up.set(0, 1, 0);
   camera.lookAt(viewTarget);
   camera.updateProjectionMatrix();
 
-  const hemi = new THREE.HemisphereLight(0xf0e8f8, 0x7a7268, 0.58);
+  const hemi = new THREE.HemisphereLight(0xf0e8f8, 0x7a7268, 0.6);
   scene.add(hemi);
 
-  const fill = new THREE.DirectionalLight(0xe8dce8, 0.32);
-  fill.position.set(-30, 44, 20);
+  const fill = new THREE.DirectionalLight(0xe8dce8, 0.34);
+  fill.position.set(-28, 38, 18);
   scene.add(fill);
 
-  const sun = new THREE.DirectionalLight(0xfff0dc, 0.95);
-  sun.position.set(36, 52, 28);
+  const sun = new THREE.DirectionalLight(0xfff0dc, 1.0);
+  sun.position.set(32, 48, 26);
   sun.castShadow = true;
-  sun.shadow.camera.left = -62;
-  sun.shadow.camera.right = 62;
-  sun.shadow.camera.top = 62;
-  sun.shadow.camera.bottom = -62;
-  sun.shadow.camera.near = 10;
-  sun.shadow.camera.far = 140;
+  sun.shadow.camera.left = -58;
+  sun.shadow.camera.right = 58;
+  sun.shadow.camera.top = 58;
+  sun.shadow.camera.bottom = -58;
+  sun.shadow.camera.near = 8;
+  sun.shadow.camera.far = 130;
   sun.shadow.mapSize.set(2048, 2048);
-  sun.shadow.radius = 2;
-  sun.shadow.bias = -0.00025;
+  sun.shadow.radius = 2.5;
+  sun.shadow.bias = -0.00022;
   scene.add(sun);
 
+  const districtW = MAIN_SPAN_M + 10;
+  const districtD = LOT_M * 2 + STREET_M + SIDEWALK_M * 2 + 8;
   const ground = new THREE.Mesh(
-    new THREE.PlaneGeometry(MAIN_SPAN_M + 14, LOT_M * 2 + STREET_M + SIDEWALK_M * 2 + 12),
+    new THREE.PlaneGeometry(districtW, districtD),
     new THREE.MeshStandardMaterial({
       color: Palette.plaza,
       roughness: 0.88,
@@ -106,7 +108,7 @@ export function createBloomvilleScene(canvas) {
         roof: Palette.structureRoof,
       },
       0,
-      northZ - 10,
+      northZ - 11,
       0,
     ),
   );
@@ -140,12 +142,10 @@ export function createBloomvilleScene(canvas) {
     }
     for (let i = 0; i < mistDrift.length; i += 1) {
       const entry = mistDrift[i];
-      entry.mesh.position.y =
-        entry.baseY + Math.sin(t * 0.15 + entry.phase) * 0.35;
+      entry.mesh.position.y = entry.baseY + Math.sin(t * 0.15 + entry.phase) * 0.25;
       entry.mesh.material.opacity =
-        entry.baseOpacity + Math.sin(t * 0.22 + entry.phase) * 0.04;
+        entry.baseOpacity + Math.sin(t * 0.22 + entry.phase) * 0.03;
     }
-    camera.updateMatrixWorld(true);
     renderer.render(scene, camera);
   }
 
@@ -274,59 +274,36 @@ function addSoftTrees(scene, lotCentersX, northZ, southZ) {
   return trees;
 }
 
-/** Soft cloud at the district edge — fog + low puffs only (no screen-filling planes). */
+/** Soft cloud/light ring — no vertical screen planes. */
 function addUnbuiltAreaCloudEdge(scene) {
   const group = new THREE.Group();
   const driftables = [];
-  const puffGeo = new THREE.SphereGeometry(1, 10, 8);
+  const puffGeo = new THREE.SphereGeometry(1, 12, 10);
+  const edgeX = MAIN_SPAN_M / 2 + 4;
+  const edgeZ = LOT_M + STREET_M / 2 + SIDEWALK_M + 6;
 
-  const ring = [
-    ...Array.from({ length: 14 }, (_, i) => {
-      const t = (i / 14) * Math.PI * 2;
-      const rx = MAIN_SPAN_M / 2 + 6 + (i % 3) * 1.2;
-      const rz = LOT_M + STREET_M / 2 + 8 + (i % 2) * 1.5;
-      return [Math.cos(t) * rx, Math.sin(t) * rz];
-    }),
-  ];
-
-  for (let i = 0; i < ring.length; i += 1) {
-    const [x, z] = ring[i];
+  for (let i = 0; i < 28; i += 1) {
+    const t = (i / 28) * Math.PI * 2;
+    const wobble = 1 + (i % 5) * 0.08;
+    const x = Math.cos(t) * edgeX * wobble;
+    const z = Math.sin(t) * edgeZ * wobble;
     const mat = new THREE.MeshBasicMaterial({
-      color: i % 2 === 0 ? 0xf4eef8 : 0xe6eef4,
+      color: i % 3 === 0 ? 0xf8f2fa : 0xe8eef6,
       transparent: true,
-      opacity: 0.14 + (i % 4) * 0.03,
+      opacity: 0.1 + (i % 4) * 0.025,
       depthWrite: false,
     });
     const puff = new THREE.Mesh(puffGeo, mat);
-    const scale = 2.8 + (i % 5) * 0.65;
-    puff.scale.set(scale * 1.6, scale * 0.75, scale * 1.1);
-    puff.position.set(x, 1.2 + (i % 3) * 0.8, z);
+    const s = 2.2 + (i % 6) * 0.55;
+    puff.scale.set(s * 1.4, s * 0.55, s);
+    puff.position.set(x, 0.8 + (i % 4) * 0.6, z);
     group.add(puff);
     driftables.push({
       mesh: puff,
-      phase: i * 0.7,
+      phase: i * 0.65,
       baseOpacity: mat.opacity,
       baseY: puff.position.y,
     });
-  }
-
-  const veilMat = new THREE.MeshBasicMaterial({
-    color: 0xdce6f0,
-    transparent: true,
-    opacity: 0.22,
-    depthWrite: false,
-  });
-  for (const [vx, vz, vw, vd] of [
-    [0, -(LOT_M + STREET_M / 2 + 14), MAIN_SPAN_M + 24, 8],
-    [0, LOT_M + STREET_M / 2 + 14, MAIN_SPAN_M + 24, 8],
-    [-(MAIN_SPAN_M / 2 + 10), 0, 8, LOT_M * 2 + 28],
-    [MAIN_SPAN_M / 2 + 10, 0, 8, LOT_M * 2 + 28],
-  ]) {
-    const veil = new THREE.Mesh(new THREE.PlaneGeometry(vw, vd), veilMat.clone());
-    veil.rotation.x = -Math.PI / 2;
-    veil.position.set(vx, 0.05, vz);
-    group.add(veil);
-    driftables.push({ mesh: veil, phase: vx + vz, baseOpacity: 0.22, baseY: 0.05 });
   }
 
   scene.add(group);
