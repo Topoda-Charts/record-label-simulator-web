@@ -1,16 +1,19 @@
 /** @typedef {{ id: string, name: string, open: boolean }} AreaRef */
 
-/** Capital Bloomville nine Areas — only Central is open in the first session. */
+/**
+ * Capital Bloomville nine Areas — only Central is open in the first session.
+ * Order: center, N/S/W/E sides, then corners clockwise (NW → NE → SW → SE).
+ */
 const AREAS = Object.freeze([
   Object.freeze({ id: "central-bloomville", name: "Central Bloomville", open: true }),
-  Object.freeze({ id: "north", name: "North", open: false }),
-  Object.freeze({ id: "south", name: "South", open: false }),
-  Object.freeze({ id: "east", name: "East", open: false }),
-  Object.freeze({ id: "west", name: "West", open: false }),
-  Object.freeze({ id: "northeast", name: "Northeast", open: false }),
-  Object.freeze({ id: "northwest", name: "Northwest", open: false }),
-  Object.freeze({ id: "southwest", name: "Southwest", open: false }),
-  Object.freeze({ id: "southeast", name: "Southeast", open: false }),
+  Object.freeze({ id: "north-bloomville", name: "North Bloomville", open: false }),
+  Object.freeze({ id: "south-bloomville", name: "South Bloomville", open: false }),
+  Object.freeze({ id: "west-bloomville", name: "West Bloomville", open: false }),
+  Object.freeze({ id: "east-bloomville", name: "East Bloomville", open: false }),
+  Object.freeze({ id: "northwest-bloomville", name: "Northwest Bloomville", open: false }),
+  Object.freeze({ id: "northeast-bloomville", name: "Northeast Bloomville", open: false }),
+  Object.freeze({ id: "southwest-bloomville", name: "Southwest Bloomville", open: false }),
+  Object.freeze({ id: "southeast-bloomville", name: "Southeast Bloomville", open: false }),
 ]);
 
 export function listAreas() {
