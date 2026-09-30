@@ -5,14 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Tune — Record Label Simulator Web</title>
     <link rel="stylesheet" href="/src/styles/shared.css" />
+    <style>
+      .field__hint {
+        display: block;
+        margin-top: 0.35rem;
+        font-size: 0.85rem;
+        line-height: 1.35;
+        opacity: 0.85;
+      }
+    </style>
   </head>
   <body class="page page--tune">
     <header class="tune-header">
       <a class="back-link" href="/">← Back to city view</a>
       <h1>Remote Config tuner</h1>
       <p class="lede">
-        Adjust live numbers for the web host. In-app defaults keep the page
-        readable when Firebase is unreachable.
+        Edit the three Remote Config parameters for the web host. The live page
+        refetches about every 60 seconds. If Firebase is unreachable, in-app
+        defaults keep the HUD readable (Record Label Simulator · 120 · 60).
       </p>
     </header>
     <main class="tune-main">
@@ -20,17 +30,21 @@
         <label class="field">
           <span>Label title</span>
           <input id="label-title" name="label_title" type="text" required />
+          <span class="field__hint" data-hint="label_title"></span>
         </label>
         <label class="field">
-          <span>Tempo</span>
+          <span>Tempo (display BPM)</span>
           <input id="tempo" name="tempo" type="number" min="40" max="240" step="1" required />
+          <span class="field__hint" data-hint="tempo"></span>
         </label>
         <label class="field">
           <span>Quality (display number)</span>
           <input id="quality" name="quality" type="number" min="0" max="100" step="1" required />
+          <span class="field__hint" data-hint="quality"></span>
         </label>
         <button type="submit" class="btn btn--primary">Save</button>
       </form>
+      <p id="tune-load-status" class="tune-status" role="status"></p>
       <p id="tune-status" class="tune-status" role="status"></p>
       <p id="tune-auth-note" class="tune-note"></p>
     </main>
