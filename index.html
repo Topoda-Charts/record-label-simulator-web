@@ -7,7 +7,9 @@
     <link rel="stylesheet" href="/src/styles/shared.css" />
   </head>
   <body class="page page--play">
-    <header class="hud">
+    <canvas id="city-canvas" aria-label="Central Bloomville city slice"></canvas>
+
+    <header class="hud hud--overlay">
       <div class="hud__brand">
         <p class="eyebrow">Central Bloomville · Gaia 2425</p>
         <h1 id="label-title" class="hud__title">Record Label Simulator</h1>
@@ -25,23 +27,27 @@
         <a class="hud__link" href="/tune/">Tune</a>
       </div>
     </header>
-    <main class="stage">
-      <canvas id="city-canvas" aria-label="Central Bloomville city slice"></canvas>
+
+    <div class="play-chrome">
       <div class="stage__bar">
         <div class="stage__work">
           <span class="stage__work-label">Stage</span>
           <span id="stage-label" class="stage__work-value">Sheet Music</span>
         </div>
+        <p id="receipt-line" class="stage__receipt"></p>
+        <div class="stage__releases">
+          <span class="stage__releases-label">Releases</span>
+          <span id="release-count" class="stage__releases-value">0</span>
+        </div>
         <button type="button" id="advance-btn" class="btn btn--advance">Advance</button>
       </div>
       <p id="config-status" class="stage__status" role="status"></p>
-    </main>
-    <footer class="footer">
-      <p>
+      <p class="play-footer-note">
         Web on Firebase build — not the Windows HDRP game. Nation accents from
         observer palette (Drive-aligned).
       </p>
-    </footer>
+    </div>
+
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>
