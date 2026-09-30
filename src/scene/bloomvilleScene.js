@@ -24,8 +24,8 @@ export function createBloomvilleScene(canvas) {
   scene.fog = new THREE.Fog(SKY_COLOR, 62, 118);
 
   /** Orthographic three-quarter: isotropic X/Z, south elevated toward City Hall (north). */
-  const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.5, 240);
   const viewTarget = new THREE.Vector3(0, 8, -2);
+  const camera = new THREE.OrthographicCamera(-92, 92, 52, -52, 0.5, 240);
   camera.position.set(72, 78, 86);
   camera.up.set(0, 1, 0);
   camera.lookAt(viewTarget);
@@ -129,6 +129,7 @@ export function createBloomvilleScene(canvas) {
     camera.top = ORTHO_HALF_H;
     camera.bottom = -ORTHO_HALF_H;
     camera.updateProjectionMatrix();
+    camera.lookAt(viewTarget);
   }
 
   function animate() {
@@ -149,10 +150,12 @@ export function createBloomvilleScene(canvas) {
   }
 
   resize();
+  requestAnimationFrame(resize);
   animate();
 
   const ro = new ResizeObserver(resize);
   ro.observe(canvas);
+  window.addEventListener("resize", resize);
 
   function setActiveBuilding(index) {
     activeIndex = ((index % buildings.length) + buildings.length) % buildings.length;
@@ -165,6 +168,7 @@ export function createBloomvilleScene(canvas) {
     dispose() {
       cancelAnimationFrame(frameId);
       ro.disconnect();
+      window.removeEventListener("resize", resize);
       renderer.dispose();
     },
   };
