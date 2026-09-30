@@ -1,7 +1,7 @@
 {
   "task": "Unity cloud Gaia observer",
-  "phase": "CU-02",
-  "state": "Unity CLI import and compilation running; player unverified",
+  "phase": "CU-03",
+  "state": "Unity CLI compilation and scene generation passed; 25/25 Unity tests passed; WebGL build pending",
   "unityVersion": "6000.5.5f1",
   "unityCliVersion": "1.0.0-beta.11",
   "renderer": "BuiltIn",
@@ -11,5 +11,8 @@
   "gmailReceipt": "1a0f379ad4474635",
   "localhostSession": 37525,
   "localhostExpiryMinutes": 60,
-  "unityGenerationSession": 87744
+  "unityGenerationSession": 87744,
+  "testsPassed": 25,
+  "testsFailed": 0,
+  "sourceCommit": "0ce5c6e26d3a04646d12763f636711cde7662d76"
 }

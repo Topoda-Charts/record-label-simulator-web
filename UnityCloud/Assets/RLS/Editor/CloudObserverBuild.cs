@@ -54,6 +54,7 @@ namespace Topoda.RLS.Editor
             var world = new GameObject("Central Bloomville").AddComponent<BloomvilleWorldPresenter>();
             world.SetMaterials(materials);
             world.Configure(sun, null, camera, materials);
+            world.gameObject.AddComponent<BloomvilleCloudBoundary>();
             var application = new GameObject("RLS Observer Application").AddComponent<ObserverApplicationController>();
             application.Configure(AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/RLS/Brand/favicon-darkmode-512.png"), ObserverReviewStage.Complete);
             application.WireObserverScene(world, rig);
@@ -91,11 +92,15 @@ namespace Topoda.RLS.Editor
             var options = new BuildPlayerOptions { scenes = new[] { ScenePath }, locationPathName = output, target = BuildTarget.WebGL, options = BuildOptions.None };
             BuildReport report = BuildPipeline.BuildPlayer(options);
             if (report.summary.result != BuildResult.Succeeded) throw new InvalidOperationException("Unity WebGL build failed: " + report.summary.result);
-            string receipt = "{\"unityVersion\":\"" + Application.unityVersion + "\",\"pipeline\":\"BuiltIn\",\"target\":\"WebGL\",\"development\":false,\"builtAtUtc\":\"" + DateTime.UtcNow.ToString("O") + "\",\"totalBytes\":" + report.summary.totalSize + "}";
+            string sourceCommit = Environment.GetEnvironmentVariable("RLS_BUILD_COMMIT") ?? "unavailable";
+            string receipt = "{\"unityVersion\":\"" + Application.unityVersion + "\",\"pipeline\":\"BuiltIn\",\"target\":\"WebGL\",\"sourceCommit\":\"" + sourceCommit + "\",\"development\":false,\"builtAtUtc\":\"" + DateTime.UtcNow.ToString("O") + "\",\"totalBytes\":" + report.summary.totalSize + "}";
             File.WriteAllText(Path.Combine(output, "BUILD-INFO.json"), receipt);
             string htmlPath = Path.Combine(output, "index.html");
             string html = File.ReadAllText(htmlPath);
             html = html.Replace(".then((unityInstance) => {", ".then((unityInstance) => { window.rlsUnityInstance = unityInstance;");
+            html = html.Replace("canvas.style.width = \"960px\";", "canvas.style.width = \"100vw\";");
+            html = html.Replace("canvas.style.height = \"600px\";", "canvas.style.height = \"100vh\";");
+            html = html.Replace("</head>", "<style>html,body{margin:0;background:#000;overflow:hidden}#unity-container.unity-desktop{position:fixed;left:0;top:0;transform:none;width:100vw;height:100vh}#unity-canvas{width:100vw!important;height:100vh!important}#unity-footer{display:none}</style></head>");
             File.WriteAllText(htmlPath, html);
             Debug.Log("RLS_CLOUD_BUILD_SUCCEEDED output=" + output + " bytes=" + report.summary.totalSize);
         }
