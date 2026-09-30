@@ -1,45 +1,69 @@
 import * as THREE from "three";
 import { Palette } from "../config/palette.js";
 
-/** Shared Bloomville block + roof prism for the web district slice. */
+/** Shared Bloomville block: windowed facade, trim, and a real roof slope. */
 export function createDistrictBuilding(spec) {
   const {
     width = 2.4,
     depth = 2.2,
-    floorHeight = 1.1,
+    floorHeight = 1.15,
     floors = 2,
     roofKind = "gable",
     roofRise = 0.85,
     wallColor = Palette.structureWall,
     roofColor = Palette.structureRoof,
+    windowGlow = 0.15,
   } = spec;
 
   const group = new THREE.Group();
   const bodyHeight = floorHeight * floors;
+  const facade = makeFacadeTexture(wallColor, floors);
 
   const wallMat = new THREE.MeshStandardMaterial({
-    color: wallColor,
-    roughness: 0.78,
-    metalness: 0.04,
+    map: facade,
+    roughness: 0.82,
+    metalness: 0.03,
   });
   const roofMat = new THREE.MeshStandardMaterial({
     color: roofColor,
-    roughness: 0.62,
-    metalness: 0.08,
+    roughness: 0.58,
+    metalness: 0.06,
   });
-  const accentMat = new THREE.MeshStandardMaterial({
-    color: Palette.labelCoral,
-    roughness: 0.45,
-    metalness: 0.12,
-    emissive: Palette.labelCoral,
-    emissiveIntensity: 0,
+  const trimMat = new THREE.MeshStandardMaterial({
+    color: Palette.stone,
+    roughness: 0.7,
+    metalness: 0.04,
   });
 
-  const body = new THREE.Mesh(new THREE.BoxGeometry(width, bodyHeight, depth), wallMat);
+  const sideMat = new THREE.MeshStandardMaterial({
+    color: wallColor,
+    roughness: 0.86,
+    metalness: 0.02,
+  });
+  const body = new THREE.Mesh(
+    new THREE.BoxGeometry(width, bodyHeight, depth),
+    [
+      sideMat,
+      sideMat,
+      trimMat,
+      trimMat,
+      wallMat,
+      wallMat,
+    ],
+  );
   body.position.y = bodyHeight / 2;
   body.castShadow = true;
   body.receiveShadow = true;
   group.add(body);
+
+  const plinth = new THREE.Mesh(
+    new THREE.BoxGeometry(width + 0.16, 0.18, depth + 0.16),
+    trimMat,
+  );
+  plinth.position.y = 0.09;
+  plinth.castShadow = true;
+  plinth.receiveShadow = true;
+  group.add(plinth);
 
   const roof = buildRoof(roofKind, width, depth, roofRise, roofMat);
   roof.position.y = bodyHeight;
@@ -51,25 +75,17 @@ export function createDistrictBuilding(spec) {
   });
   group.add(roof);
 
-  const band = new THREE.Mesh(
-    new THREE.BoxGeometry(width * 0.92, 0.12, depth * 0.92),
-    accentMat,
-  );
-  band.position.y = bodyHeight * 0.55;
-  band.castShadow = true;
-  group.add(band);
+  const glow = new THREE.PointLight(Palette.labelCoral, 0, 6, 2);
+  glow.position.set(0, bodyHeight * 0.55, depth * 0.55);
+  group.add(glow);
 
   function setActive(active) {
-    const emissive = active ? 0.22 : 0;
     wallMat.emissive.setHex(active ? Palette.labelCoral : 0x000000);
-    wallMat.emissiveIntensity = emissive;
-    accentMat.emissiveIntensity = active ? 0.55 : 0;
-    if (active) {
-      wallMat.color.setHex(Palette.surfaceRaised);
-    } else {
-      wallMat.color.setHex(wallColor);
-    }
+    wallMat.emissiveIntensity = active ? 0.18 : windowGlow * 0.02;
+    glow.intensity = active ? 1.4 : windowGlow;
   }
+
+  setActive(false);
 
   return { group, setActive };
 }
@@ -78,26 +94,86 @@ function buildRoof(kind, width, depth, rise, material) {
   const roofGroup = new THREE.Group();
 
   if (kind === "flat") {
-    const slab = new THREE.Mesh(new THREE.BoxGeometry(width * 1.04, 0.18, depth * 1.04), material);
-    slab.position.y = 0.09;
+    const slab = new THREE.Mesh(
+      new THREE.BoxGeometry(width + 0.28, 0.22, depth + 0.28),
+      material,
+    );
+    slab.position.y = 0.11;
     roofGroup.add(slab);
     return roofGroup;
   }
 
   if (kind === "sawtooth") {
-    const step = new THREE.Mesh(new THREE.BoxGeometry(width * 0.48, rise, depth * 1.02), material);
-    step.position.set(-width * 0.22, rise / 2, 0);
-    roofGroup.add(step);
-    const step2 = new THREE.Mesh(new THREE.BoxGeometry(width * 0.38, rise * 0.65, depth * 1.02), material);
-    step2.position.set(width * 0.26, rise * 0.325, 0);
-    roofGroup.add(step2);
+    const step = new THREE.Mesh(new THREE.BoxGeometry(width * 0.55, rise, depth + 0.08), material);
+    step.position.set(-width * 0.2, rise / 2, 0);
+    const step2 = new THREE.Mesh(
+      new THREE.BoxGeometry(width * 0.4, rise * 0.62, depth + 0.08),
+      material,
+    );
+    step2.position.set(width * 0.24, rise * 0.31, 0);
+    roofGroup.add(step, step2);
     return roofGroup;
   }
 
-  const geometry = new THREE.ConeGeometry(Math.max(width, depth) * 0.62, rise, 4, 1);
-  const mesh = new THREE.Mesh(geometry, material);
-  mesh.rotation.y = Math.PI / 4;
-  mesh.position.y = rise / 2;
-  roofGroup.add(mesh);
+  const gable = new THREE.Mesh(gableGeometry(width + 0.2, depth + 0.16, rise), material);
+  roofGroup.add(gable);
   return roofGroup;
+}
+
+function gableGeometry(width, depth, rise) {
+  const hw = width / 2;
+  const hd = depth / 2;
+  const positions = new Float32Array([
+    -hw, 0, hd,
+    hw, 0, hd,
+    0, rise, hd,
+    -hw, 0, -hd,
+    hw, 0, -hd,
+    0, rise, -hd,
+  ]);
+  const indices = [
+    0, 1, 2,
+    3, 5, 4,
+    0, 2, 5, 0, 5, 3,
+    1, 4, 5, 1, 5, 2,
+    0, 3, 4, 0, 4, 1,
+  ];
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+  geometry.setIndex(indices);
+  geometry.computeVertexNormals();
+  return geometry;
+}
+
+function makeFacadeTexture(wallHex, floors) {
+  const canvas = document.createElement("canvas");
+  canvas.width = 192;
+  canvas.height = 96 * Math.max(floors, 2);
+  const ctx = canvas.getContext("2d");
+  ctx.fillStyle = cssHex(wallHex);
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  const rows = Math.max(floors, 2) * 2;
+  const cols = 3;
+  for (let row = 0; row < rows; row += 1) {
+    for (let col = 0; col < cols; col += 1) {
+      const x = 18 + col * 36;
+      const y = 16 + row * 30;
+      ctx.fillStyle = "#243044";
+      ctx.fillRect(x, y, 22, 28);
+      ctx.fillStyle = row % 2 === 0 ? "rgba(255, 214, 160, 0.62)" : "rgba(186, 214, 232, 0.42)";
+      ctx.fillRect(x + 3, y + 3, 16, 10);
+      ctx.strokeStyle = "rgba(255,255,255,0.12)";
+      ctx.strokeRect(x + 0.5, y + 0.5, 21, 27);
+    }
+  }
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.anisotropy = 4;
+  return texture;
+}
+
+function cssHex(hex) {
+  return `#${hex.toString(16).padStart(6, "0")}`;
 }
