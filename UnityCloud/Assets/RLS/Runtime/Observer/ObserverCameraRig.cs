@@ -22,6 +22,7 @@ namespace Topoda.RLS.Observer
         private Vector3 zoomAnchor;
         private Vector2 zoomPointer;
         private bool hasZoomAnchor;
+        private bool memberFollowActive;
         private Vector3 focusPoint = OverviewFocus;
         private Vector3 focusTarget = OverviewFocus;
         private Vector3 focusVelocity;
@@ -55,6 +56,7 @@ namespace Topoda.RLS.Observer
             zoomTarget = DefaultDistance;
             zoomVelocity = 0f;
             hasZoomAnchor = false;
+            memberFollowActive = false;
             focusVelocity = Vector3.zero;
             if (instant || reducedMotion)
             {
@@ -65,6 +67,7 @@ namespace Topoda.RLS.Observer
         public void Focus(Vector3 worldPoint, bool instant)
         {
             hasZoomAnchor = false;
+            memberFollowActive = false;
             focusTarget = worldPoint;
             focusTarget.y = Mathf.Max(focusTarget.y, 0f);
             if (instant || reducedMotion)
@@ -77,13 +80,19 @@ namespace Topoda.RLS.Observer
 
         public void FollowMember(Vector3 worldPoint)
         {
+            memberFollowActive = true;
             focusTarget = new Vector3(
                 Mathf.Clamp(worldPoint.x, -MemberFollowWorldBound, MemberFollowWorldBound),
-                Mathf.Clamp(worldPoint.y, 0f, 4f),
+                Mathf.Clamp(worldPoint.y, 0f, 4f) + 0.82f,
                 Mathf.Clamp(worldPoint.z, -MemberFollowWorldBound, MemberFollowWorldBound));
             zoomTarget = MemberFollowDistance;
             hasZoomAnchor = false;
             pitch = MemberFollowPitch;
+        }
+
+        public void StopFollowing()
+        {
+            memberFollowActive = false;
         }
 
         public void HandleKeyboardPan(Vector2 axis, float deltaTime)
@@ -230,6 +239,12 @@ namespace Topoda.RLS.Observer
             Vector3 offset = rotation * new Vector3(0f, 0f, -distance);
             observerCamera.transform.position = focusPoint + offset;
             observerCamera.transform.rotation = rotation;
+            if (memberFollowActive && Physics.SphereCast(focusPoint, 0.3f, offset.normalized, out RaycastHit obstruction, offset.magnitude, Physics.AllLayers, QueryTriggerInteraction.Ignore))
+            {
+                // Keep the viewing path on the member's side of an intervening
+                // wall instead of leaving the camera behind the building.
+                observerCamera.transform.position = focusPoint + offset.normalized * Mathf.Max(1.1f, obstruction.distance - 0.45f);
+            }
         }
 
         private Vector3 FlatForward()

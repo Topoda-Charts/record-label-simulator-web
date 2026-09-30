@@ -50,7 +50,7 @@ namespace Topoda.RLS.Observer
             yield return null;
             SafeAutosave("observer initialized");
             coldGenerationElapsedSeconds = Time.realtimeSinceStartupAsDouble - generationStartedRealtime;
-            statusMessage = (mode == ObserverMode.OpenHandoff ? "Cold Aug 31 generation" : "Observer initialization") + ": " + coldGenerationElapsedSeconds.ToString("0.000") + " s";
+            statusMessage = "Local snapshots ready";
             Debug.Log("RLS_OBSERVER_READY mode=" + mode + " elapsedSeconds=" + coldGenerationElapsedSeconds.ToString("0.000", System.Globalization.CultureInfo.InvariantCulture) + " digest=" + simulation.World.Digest);
             state = ApplicationState.Observer;
             RefreshWorldPresenter(true);

@@ -282,7 +282,7 @@ namespace Topoda.RLS.Observer
                 foreach (var work in simulation.World.Works.Where(x => x.LabelId == label.Id).OrderByDescending(x => x.CreatedTicks).Take(4))
                 { var item = Box(workList, "work-card"); Text(item, work.Title, "work-title"); Text(item, ObserverDisplayFormat.StageLabel(work), "muted"); }
             }
-            var recent = simulation.RecentEvents(eventHistoryOpen ? 20 : 2, eventFilter);
+            var recent = simulation.RecentEvents(eventHistoryOpen ? 20 : 1, eventFilter);
             string eventsKey = eventFilter + "|" + string.Join("|", recent.Select(item => item.OccurredTicks + ":" + item.Headline));
             if (eventsKey == renderedEventsKey) return;
             renderedEventsKey = eventsKey;

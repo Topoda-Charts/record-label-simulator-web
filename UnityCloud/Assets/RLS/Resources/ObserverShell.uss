@@ -20,7 +20,7 @@
 .topbar-location { width: 220px; min-width: 190px; flex-shrink: 0; }
 .topbar-center { flex-grow: 1; min-width: 0; flex-direction: row; align-items: center; justify-content: center; flex-wrap: wrap; }
 .topbar-right { width: 30%; min-width: 300px; flex-direction: row; align-items: center; justify-content: flex-end; flex-wrap: wrap; }
-.topbar-save-status { max-width: 150px; margin-left: 4px; margin-right: 4px; color: rgb(176, 176, 176); font-size: 12px; white-space: normal; }
+.topbar-save-status { width: 100px; max-width: 100px; margin-left: 4px; margin-right: 4px; color: rgb(176, 176, 176); font-size: 12px; white-space: normal; }
 .brand { font-size: 18px; -unity-font-style: bold; }
 .clock { margin-right: 8px; align-items: center; }
 .clock-text { font-size: 16px; }
@@ -32,9 +32,9 @@
 .works { max-height: 240px; }
 .work-card { padding: 10px 0; border-bottom-width: 1px; border-bottom-color: rgb(58, 58, 58); }
 .work-title { font-size: 15px; white-space: normal; }
-.event-feed { position: absolute; left: 16px; right: 382px; bottom: 16px; height: 92px; padding: 8px; }
+.event-feed { position: absolute; left: auto; right: 382px; bottom: 16px; width: 600px; max-width: 76%; height: 92px; padding: 8px; }
 .event-feed.wide-feed { right: 16px; }
-.event-feed.history-open { height: 240px; max-height: 40%; }
+.event-feed.history-open { left: 16px; width: auto; height: 240px; max-height: 40%; }
 .event-header { justify-content: space-between; align-items: center; margin-bottom: 2px; }
 .event-filters { align-items: center; }
 .feed-title { -unity-font-style: bold; font-size: 13px; margin-right: 8px; }
@@ -60,7 +60,7 @@
 .compact-viewport .topbar-save-status { max-width: 120px; }
 .compact-viewport .clock { margin-right: 6px; }
 .compact-viewport .inspector { top: 148px; right: 10px; bottom: 178px; width: 40%; max-width: 350px; }
-.compact-viewport .event-feed { left: 10px; right: 10px; bottom: 10px; height: 84px; max-height: 28%; }
+.compact-viewport .event-feed { left: 10px; right: 10px; bottom: 10px; width: auto; max-width: none; height: 84px; max-height: 28%; }
 .compact-viewport .event-feed.history-open { height: 160px; }
 .compact-viewport .save-status { bottom: 142px; left: 12px; }
 .compact-viewport .error-banner { left: 10px; right: 10px; bottom: 142px; padding: 10px; }

@@ -25,6 +25,7 @@ namespace Topoda.RLS.Observer
             public bool paused;
             public string selectedMember;
             public string followingMember;
+            public bool followingOccluded;
             public float cameraDistance;
             public float zoomTarget;
             public Vector3 cameraPosition;
@@ -100,6 +101,8 @@ namespace Topoda.RLS.Observer
                         Vector3 point = rig.ObserverCamera.WorldToScreenPoint(position + Vector3.up * 0.82f);
                         if (point.z > 0f) points.Add(new MemberPoint { id = member.Id, x = point.x, y = Screen.height - point.y });
                     }
+                    if (!string.IsNullOrEmpty(receipt.followingMember) && proxies.TryGetMemberPosition(receipt.followingMember, out Vector3 followed))
+                        receipt.followingOccluded = Physics.Linecast(rig.ObserverCamera.transform.position, followed + Vector3.up * 0.82f, Physics.AllLayers, QueryTriggerInteraction.Ignore);
                 }
                 receipt.memberPoints = points.ToArray();
             }

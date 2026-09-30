@@ -157,6 +157,7 @@ namespace Topoda.RLS.Observer
 
             memberFollowing = false;
             memberFollowingId = null;
+            cameraRig?.StopFollowing();
             RefreshMemberInspector();
         }
 

@@ -1,16 +1,15 @@
 {
-  "checkpoint": "CU-05",
-  "sourceCommit": "1d7722e365e92e3413a2ccb4ea44f57c75f51987",
-  "engineResult": "Succeeded",
-  "browserResult": "Passed",
-  "visualUiObserved": true,
-  "testedSurface": "Menu, January, September, named snapshot, browser reload",
-  "browserErrors": 0,
-  "sourceEditPhase": "CU-06 in progress",
+  "checkpoint": "CU-06",
+  "state": "25/25 Unity tests pass; isolated WebGL build running; browser input verification pending",
+  "lastVerifiedCheckpoint": "CU-05",
+  "sourceCommit": "4c5659ac27454abca8348b35bce0cf899c601cd9",
+  "unityBuildSession": 59405,
+  "buildTimeoutSeconds": 2400,
+  "previewProcess": 11384,
+  "previewSession": 86488,
+  "previewExpiresAtUtc": "2026-09-30T22:14:07.096Z",
+  "currentPlayer": "http://localhost:8080/",
+  "nextPlayer": "http://localhost:8080/preview/",
   "firebasePublished": false,
-  "previewProcess": 8664,
-  "previewSession": 88823,
-  "previewExpiresAt": "2026-09-30T17:42:00-04:00",
-  "slackReceipt": "https://topodacharts.slack.com/archives/D09QY6N71TM/p1790801177586909",
-  "gmailReceipt": "1a0f411864ac4284"
+  "agents": "All three Luna assignments completed"
 }
