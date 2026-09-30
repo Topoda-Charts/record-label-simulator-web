@@ -8,7 +8,7 @@ const STREET_M = 12;
 const SIDEWALK_M = 2;
 const MAIN_SPAN_M = LOT_M * 4 + STREET_M;
 const SKY_COLOR = 0xd7e2f0;
-const ORTHO_HALF_H = 46;
+const ORTHO_HALF_H = 52;
 
 export function createBloomvilleScene(canvas) {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
@@ -21,13 +21,15 @@ export function createBloomvilleScene(canvas) {
 
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(SKY_COLOR);
-  scene.fog = new THREE.Fog(SKY_COLOR, 48, 102);
+  scene.fog = new THREE.Fog(SKY_COLOR, 62, 118);
 
-  /** Orthographic three-quarter: isotropic X/Z, elevated south looking north (City Hall / Main Street). */
+  /** Orthographic three-quarter: isotropic X/Z, south elevated toward City Hall (north). */
   const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.5, 240);
-  camera.position.set(42, 74, 68);
+  const viewTarget = new THREE.Vector3(0, 8, -2);
+  camera.position.set(72, 78, 86);
   camera.up.set(0, 1, 0);
-  camera.lookAt(0, 7, 0);
+  camera.lookAt(viewTarget);
+  camera.updateProjectionMatrix();
 
   const hemi = new THREE.HemisphereLight(0xf0e8f8, 0x7a7268, 0.58);
   scene.add(hemi);
@@ -142,6 +144,7 @@ export function createBloomvilleScene(canvas) {
       entry.mesh.material.opacity =
         entry.baseOpacity + Math.sin(t * 0.22 + entry.phase) * 0.04;
     }
+    camera.updateMatrixWorld(true);
     renderer.render(scene, camera);
   }
 
