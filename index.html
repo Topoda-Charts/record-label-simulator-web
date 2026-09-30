@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Record Label Simulator — Web</title>
+    <link rel="stylesheet" href="/src/styles/shared.css" />
+  </head>
+  <body class="page page--play">
+    <header class="hud">
+      <div class="hud__brand">
+        <p class="eyebrow">Central Bloomville · Gaia 2425</p>
+        <h1 id="label-title" class="hud__title">Record Label Simulator</h1>
+        <p id="lore-line" class="hud__lore"></p>
+      </div>
+      <div class="hud__stats">
+        <div class="stat">
+          <span class="stat__label">Tempo</span>
+          <span id="tempo-value" class="stat__value">120</span>
+        </div>
+        <div class="stat">
+          <span class="stat__label">Quality</span>
+          <span id="quality-value" class="stat__value">60</span>
+        </div>
+        <a class="hud__link" href="/tune/">Tune</a>
+      </div>
+    </header>
+    <main class="stage">
+      <canvas id="city-canvas" aria-label="Central Bloomville city slice"></canvas>
+      <p id="config-status" class="stage__status" role="status"></p>
+    </main>
+    <footer class="footer">
+      <p>
+        Web on Firebase build — not the Windows HDRP game. Nation accents from
+        observer palette (Drive-aligned).
+      </p>
+    </footer>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
