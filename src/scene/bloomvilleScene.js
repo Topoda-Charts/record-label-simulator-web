@@ -8,7 +8,7 @@ const STREET_M = 12;
 const SIDEWALK_M = 2;
 const MAIN_SPAN_M = LOT_M * 4 + STREET_M;
 const SKY_COLOR = 0xd7e2f0;
-const ORTHO_HALF_H = 40;
+const ORTHO_HALF_H = 46;
 
 export function createBloomvilleScene(canvas) {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
@@ -25,9 +25,9 @@ export function createBloomvilleScene(canvas) {
 
   /** Orthographic three-quarter: isotropic X/Z, elevated south looking north (City Hall / Main Street). */
   const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.5, 240);
-  camera.position.set(48, 66, 58);
+  camera.position.set(42, 74, 68);
   camera.up.set(0, 1, 0);
-  camera.lookAt(0, 9, -6);
+  camera.lookAt(0, 7, 0);
 
   const hemi = new THREE.HemisphereLight(0xf0e8f8, 0x7a7268, 0.58);
   scene.add(hemi);
